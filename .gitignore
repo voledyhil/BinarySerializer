@@ -1,0 +1,8 @@
+.DS_Store
+.idea
+BinarySerializer.Tests/bin
+BinarySerializer.Tests/obj
+BinarySerializer.Tests/report
+BinarySerializer.Tests/coverage.opencover.xml
+BinarySerializer/bin
+BinarySerializer/obj
