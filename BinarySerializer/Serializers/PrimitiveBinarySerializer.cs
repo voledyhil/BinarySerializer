@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using BinarySerializer.Data;
 using BinarySerializer.Expressions;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -20,6 +21,7 @@ namespace BinarySerializer.Serializers
 
         public abstract void Update(object obj, BinaryDataReader reader);
         public abstract void Serialize(object obj, BinaryDataWriter writer);
+        public abstract void Serialize(object obj, BinaryDataWriter writer, Baseline baseline);
     }
     
     public class BoolBinarySerializer : PrimitiveBinarySerializer<bool>
@@ -35,8 +37,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            bool value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteBool(Getter.Get(obj));
+            writer.WriteBool(true);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            bool value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out bool baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteBool(value);
         }
     }
     
@@ -52,9 +70,25 @@ namespace BinarySerializer.Serializers
         }
 
         public override void Serialize(object obj, BinaryDataWriter writer)
-        {
+        {            
+            byte value = Getter.Get(obj);
+            if (value == default)
+                return;
+
             writer.WriteByte(Index);
-            writer.WriteByte(Getter.Get(obj));
+            writer.WriteByte(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            byte value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteByte(value);
         }
     }
     
@@ -66,12 +100,29 @@ namespace BinarySerializer.Serializers
 
         public override void Update(object obj, BinaryDataReader reader)
         {
-            throw new NotImplementedException();
+            Setter.Set(obj, reader.ReadChar());
         }
 
         public override void Serialize(object obj, BinaryDataWriter writer)
+        {            
+            char value = Getter.Get(obj);
+            if (value == default)
+                return;
+
+            writer.WriteByte(Index);
+            writer.WriteChar(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
         {
-            throw new NotImplementedException();
+            char value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteChar(value);
         }
     }
     
@@ -88,8 +139,25 @@ namespace BinarySerializer.Serializers
         
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            double value = Getter.Get(obj);
+            if (Math.Abs(value) < 1e-6)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteDouble(Getter.Get(obj));
+            writer.WriteDouble(value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            double value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out double baseValue) && Math.Abs(value) < 1e-6 ||
+                Math.Abs(baseValue - value) < 1e-6)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteDouble(value);
         }
     }
     
@@ -106,8 +174,25 @@ namespace BinarySerializer.Serializers
         
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            float value = Getter.Get(obj);
+            if (Math.Abs(value) < 1e-6)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteFloat(Getter.Get(obj));
+            writer.WriteFloat(value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            float value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out float baseValue) && Math.Abs(value) < 1e-6 ||
+                Math.Abs(baseValue - value) < 1e-6)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteFloat(value);
         }
     }
     
@@ -124,8 +209,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            int value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteInt(Getter.Get(obj));
+            writer.WriteInt(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            int value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteInt(value);
         }
     }
     
@@ -142,8 +243,24 @@ namespace BinarySerializer.Serializers
         
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            long value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteLong(Getter.Get(obj));
+            writer.WriteLong(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            long value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out long baseValue) && value == default || baseValue == value)
+                return;
+            
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteLong(value);
         }
     }
     
@@ -160,8 +277,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            sbyte value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteSByte(Getter.Get(obj));
+            writer.WriteSByte(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            sbyte value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out sbyte baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteSByte(value);
         }
     }
     
@@ -178,8 +311,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            short value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteShort(Getter.Get(obj));
+            writer.WriteShort(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            short value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out short baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+            
+            writer.WriteByte(Index);
+            writer.WriteShort(value);
         }
     }
     
@@ -196,8 +345,25 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            float value = Getter.Get(obj);
+            if (Math.Abs(value) < 1e-6)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteShortFloat(Getter.Get(obj));
+            writer.WriteShortFloat(value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            float value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out float baseValue) && Math.Abs(value) < 1e-6 ||
+                Math.Abs(baseValue - value) < 1e-6)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteShortFloat(value);
         }
     }
     
@@ -214,8 +380,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            string value = Getter.Get(obj);
+            if (string.IsNullOrEmpty(value))
+                return;
+            
             writer.WriteByte(Index);
             writer.WriteString(Getter.Get(obj));
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            string value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out string baseValue) && string.IsNullOrEmpty(value) || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteString(value);
         }
     }
     
@@ -232,8 +414,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            uint value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteUInt(Getter.Get(obj));
+            writer.WriteUInt(value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            uint value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out uint baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteUInt(value);
         }
     }
     
@@ -250,8 +448,24 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            ulong value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteULong(Getter.Get(obj));
+            writer.WriteULong(value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            ulong value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out ulong baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteULong(value);
         }
     }
     
@@ -268,8 +482,24 @@ namespace BinarySerializer.Serializers
         
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
+            ushort value = Getter.Get(obj);
+            if (value == default)
+                return;
+            
             writer.WriteByte(Index);
-            writer.WriteUShort(Getter.Get(obj));
+            writer.WriteUShort(value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            ushort value = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out ushort baseValue) && value == default || baseValue == value)
+                return;
+
+            baseline[Index] = value;
+
+            writer.WriteByte(Index);
+            writer.WriteUShort(value);
         }
     }
 }

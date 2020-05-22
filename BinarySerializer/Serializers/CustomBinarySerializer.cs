@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BinarySerializer.Data;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -26,8 +27,14 @@ namespace BinarySerializer.Serializers
         {
             Serialize((T) obj, writer);
         }
-            
+
+        void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Serialize((T) obj, writer, baseline);
+        }
+
         protected abstract void Update(T obj, BinaryDataReader reader);
         protected abstract void Serialize(T obj, BinaryDataWriter writer);
+        protected abstract void Serialize(T obj, BinaryDataWriter writer, Baseline baseline);
     }
 }

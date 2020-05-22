@@ -34,6 +34,16 @@ namespace BinarySerializer.Data
             Position++;
             return retval;
         }
+        
+        public char ReadChar()
+        {
+            if (!(InnerLen - _innerPosition >= 2))
+                throw new BufferException("Trying to read past the buffer size");
+            char retval = Buffer.ToChar(_innerPosition);
+            _innerPosition += 2;
+            Position += 2;
+            return retval;    
+        }
 
         public short ReadShort()
         {

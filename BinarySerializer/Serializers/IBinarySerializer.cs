@@ -1,4 +1,5 @@
 using BinarySerializer.Data;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -6,5 +7,6 @@ namespace BinarySerializer.Serializers
     {
         void Update(object obj, BinaryDataReader reader);
         void Serialize(object obj, BinaryDataWriter writer);
+        void Serialize(object obj, BinaryDataWriter writer, Baseline baseline);
     }
 }

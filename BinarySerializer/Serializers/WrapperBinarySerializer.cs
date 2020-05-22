@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using BinarySerializer.Data;
 using BinarySerializer.Expressions;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -30,6 +31,18 @@ namespace BinarySerializer.Serializers
         {
             BinaryDataWriter childWriter = writer.TryWriteNode(sizeof(byte));
             _serializer.Serialize(_getter.Get(obj), childWriter);
+            
+            if (childWriter.Length <= 0)
+                return;
+            
+            writer.WriteByte(_index);
+            childWriter.PushNode();
+        }
+
+        public void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            BinaryDataWriter childWriter = writer.TryWriteNode(sizeof(byte));
+            _serializer.Serialize(_getter.Get(obj), childWriter, baseline.GetOrCreateBaseline(_index));
             
             if (childWriter.Length <= 0)
                 return;

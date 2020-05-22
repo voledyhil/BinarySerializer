@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using BinarySerializer.Data;
 using BinarySerializer.Expressions;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -31,7 +33,7 @@ namespace BinarySerializer.Serializers
             while (reader.Position < reader.Length)
             {
                 object key = ReadKey(reader);
-                if (key == _reservedKey)
+                if (_reservedKey.Equals(key))
                     break;
 
                 using (BinaryDataReader itemReader = reader.ReadNode())
@@ -63,18 +65,51 @@ namespace BinarySerializer.Serializers
 
             foreach (object key in dict.Keys)
             {
-                if (key == _reservedKey)
+                if (_reservedKey.Equals(key))
                     throw new ArgumentException();
                 
                 BinaryDataWriter itemWriter = writer.TryWriteNode(_keySize);
 
                 _itemSerializer.Serialize(dict[key], itemWriter);
 
+                if (itemWriter.Length <= 0) 
+                    continue;
+                
+                WriteKey(key, writer);
+                itemWriter.PushNode();
+            }
+        }
+
+        public void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            IDictionary dict = (IDictionary) obj;
+
+            List<object> baseKeys = new List<object>(baseline.BaselineKeys);
+            foreach (object key in dict.Keys)
+            {
+                object value = dict[key];
+                BinaryDataWriter itemWriter = writer.TryWriteNode(_keySize);
+                
+                _itemSerializer.Serialize(value, itemWriter, baseline.GetOrCreateBaseline(key));
+
                 if (itemWriter.Length > 0)
                 {
                     WriteKey(key, writer);
                     itemWriter.PushNode();
                 }
+                
+                baseKeys.Remove(key);
+            }
+
+            if (baseKeys.Count <= 0)
+                return;
+
+            WriteKey(_reservedKey, writer);
+           
+            foreach (object key in baseKeys)
+            {
+                WriteKey(key, writer);
+                baseline.DestroyBaseline(key);
             }
         }
     }

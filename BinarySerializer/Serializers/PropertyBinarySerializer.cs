@@ -3,6 +3,7 @@ using System.Reflection;
 using BinarySerializer.Data;
 using BinarySerializer.Expressions;
 using BinarySerializer.Properties;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -19,6 +20,7 @@ namespace BinarySerializer.Serializers
 
         public abstract void Update(object obj, BinaryDataReader reader);
         public abstract void Serialize(object obj, BinaryDataWriter writer);
+        public abstract void Serialize(object obj, BinaryDataWriter writer, Baseline baseline);
     }
     
     
@@ -36,8 +38,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<bool> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default)
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteBool(property.Value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<bool> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteBool(property.Value);
@@ -58,8 +72,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<int> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default)
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteInt(property.Value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<int> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteInt(property.Value);
@@ -80,11 +106,23 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<byte> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default)
                 return;
             
             writer.WriteByte(Index);
-            writer.WriteInt(property.Value);
+            writer.WriteByte(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<byte> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
+            
+            writer.WriteByte(Index);
+            writer.WriteByte(property.Value);
         }
     }
     
@@ -96,17 +134,29 @@ namespace BinarySerializer.Serializers
 
         public override void Update(object obj, BinaryDataReader reader)
         {
-           // Getter.Get(obj).Update(reader.ReadByte());
+            Getter.Get(obj).Update(reader.ReadChar());
         }
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
-//            Property<byte> property = Getter.Get(obj);
-//            if (!property.IsDirty) 
-//                return;
-//            
-//            writer.WriteByte(Index);
-//            writer.WriteInt(property.Value);
+            Property<char> property = Getter.Get(obj);
+            if (property.Value == default)
+                return;
+            
+            writer.WriteByte(Index);
+            writer.WriteChar(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<char> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
+            
+            writer.WriteByte(Index);
+            writer.WriteChar(property.Value);
         }
     }
     
@@ -124,8 +174,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<double> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (Math.Abs(property.Value) < 1e-6)
                 return;
+
+            writer.WriteByte(Index);
+            writer.WriteDouble(property.Value);
+        }
+
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<double> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteDouble(property.Value);
@@ -146,8 +208,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<float> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (Math.Abs(property.Value) < 1e-6) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteFloat(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<float> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteFloat(property.Value);
@@ -168,8 +242,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<long> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteLong(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<long> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteLong(property.Value);
@@ -190,8 +276,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<sbyte> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteSByte(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<sbyte> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteSByte(property.Value);
@@ -212,8 +310,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<short> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteShort(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<short> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteShort(property.Value);
@@ -234,8 +344,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<float> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (Math.Abs(property.Value) < 1e-6) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteShortFloat(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<float> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteShortFloat(property.Value);
@@ -256,8 +378,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<string> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (string.IsNullOrEmpty(property.Value)) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteString(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<string> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteString(property.Value);
@@ -278,8 +412,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<uint> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteUInt(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<uint> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteUInt(property.Value);
@@ -300,8 +446,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<ulong> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteULong(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<ulong> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteULong(property.Value);
@@ -322,8 +480,20 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
             Property<ushort> property = Getter.Get(obj);
-            if (!property.IsDirty) 
+            if (property.Value == default) 
                 return;
+            
+            writer.WriteByte(Index);
+            writer.WriteUShort(property.Value);
+        }
+        
+        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            Property<ushort> property = Getter.Get(obj);
+            if (!baseline.TryGetValue(Index, out int baseVersion) && property.Version == 0 || baseVersion == property.Version)
+                return;
+
+            baseline[Index] = property.Version;
             
             writer.WriteByte(Index);
             writer.WriteUShort(property.Value);

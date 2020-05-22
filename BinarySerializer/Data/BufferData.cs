@@ -35,6 +35,10 @@ namespace BinarySerializer.Data
             Buffer.BlockCopy(_data, srcOffset, dst, dstOffset, count);
         }
 
+        public char ToChar(int position)
+        {
+            return BitConverter.ToChar(_data, position);
+        }
 
         public ushort ToUInt16(int position)
         {

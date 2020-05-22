@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BinarySerializer.Data;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
@@ -25,6 +26,14 @@ namespace BinarySerializer.Serializers
             for (int i = 0; i < _items.Count && i < byte.MaxValue; i++)
             {
                 _items[i].Serialize(obj, writer);
+            }
+        }
+
+        public void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        {
+            for (int i = 0; i < _items.Count && i < byte.MaxValue; i++)
+            {
+                _items[i].Serialize(obj, writer, baseline);
             }
         }
     }

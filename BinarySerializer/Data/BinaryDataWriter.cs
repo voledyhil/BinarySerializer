@@ -32,6 +32,7 @@ namespace BinarySerializer.Data
             Buffer[InnerLen] = value;
             IncLength(1);
         }
+        
 
         public void WriteShort(short value)
         {
@@ -47,6 +48,13 @@ namespace BinarySerializer.Data
             IncLength(1);
         }
 
+        public void WriteChar(char value)
+        {
+            Buffer.EnsureBufferSize(InnerLen + 2);
+            FastBitConverter.Write(Buffer.Data, InnerLen, value);
+            IncLength(2);
+        }
+        
         public void WriteUShort(ushort value)
         {
             Buffer.EnsureBufferSize(InnerLen + 2);
