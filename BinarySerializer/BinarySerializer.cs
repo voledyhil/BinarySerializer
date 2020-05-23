@@ -165,37 +165,37 @@ namespace BinarySerializer
                         if (typeof(IBinaryObjectCollection<byte>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryByteKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<byte>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<short>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryShortKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<short>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<short>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<ushort>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<ushort>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<ushort>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<int>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryIntKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<int>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<int>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<uint>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<uint>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<uint>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<long>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryLongKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<long>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<long>(index, ownerType, field, childSer));
                         }
                         else if (typeof(IBinaryObjectCollection<ulong>).IsAssignableFrom(fieldType))
                         {
                             childSer = new DictionaryULongKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new WrapperBinarySerializer<Baseline<ulong>>(index, ownerType, field, childSer));
+                            serializers.Add(new ByteWrapperBinarySerializer<ulong>(index, ownerType, field, childSer));
                         }
                         else throw new ArgumentException();
 
@@ -211,12 +211,12 @@ namespace BinarySerializer
                         childSer = (ICustomBinarySerializer) creator.Create(Serializers);
                         Serializers.Add(fieldType, childSer);
 
-                        serializers.Add(new WrapperBinarySerializer<Baseline<byte>>(index, ownerType, field, childSer));
+                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
                     }
                     else
                     {
                         childSer = Register(fieldType);
-                        serializers.Add(new WrapperBinarySerializer<Baseline<byte>>(index, ownerType, field, childSer));
+                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
                     }
                 }
                 else throw new ArgumentException();

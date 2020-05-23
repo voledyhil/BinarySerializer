@@ -8,16 +8,16 @@ namespace BinarySerializer.Serializers.Baselines
         new IBaseline Clone();
     }
 
-    public interface IBaseline<TKey> : IBaseline where TKey : unmanaged
+    public interface IBaseline<TKey, TChildKey> : IBaseline where TKey : unmanaged where TChildKey : unmanaged
     {
         IEnumerable<TKey> BaselineKeys { get; }
-        bool TryGetValue<T>(TKey key, out T value);
-        T GetOrCreateBaseline<T>(TKey key) where T : class, IBaseline, new();
+        bool TryGetValue<TValue>(TKey key, out TValue value);
+        IBaseline<TChildKey, TNewChildKey> GetOrCreateBaseline<TNewChildKey>(TKey key) where TNewChildKey : unmanaged;
         object this[TKey key] { get; set; }
         void DestroyBaseline(TKey key);
     }
 
-    public class Baseline<TKey> : IBaseline<TKey> where TKey : unmanaged
+    public class Baseline<TKey, TChild> : IBaseline<TKey, TChild> where TKey : unmanaged where TChild : unmanaged
     {
         public IEnumerable<TKey> BaselineKeys => _baselines.Keys;
         
@@ -36,7 +36,7 @@ namespace BinarySerializer.Serializers.Baselines
             _baselines = new Dictionary<TKey, IBaseline>();
             foreach (KeyValuePair<TKey, IBaseline> item in baselines)
             {
-                _baselines.Add(item.Key, (IBaseline)item.Value.Clone());
+                _baselines.Add(item.Key, item.Value.Clone());
             }
         }
 
@@ -56,12 +56,12 @@ namespace BinarySerializer.Serializers.Baselines
             return true;
         }
         
-        public T GetOrCreateBaseline<T>(TKey key) where T : class, IBaseline, new()
+        public IBaseline<TChild, TNewChildKey> GetOrCreateBaseline<TNewChildKey>(TKey key) where TNewChildKey : unmanaged
         {
             if (_baselines.TryGetValue(key, out IBaseline item))
-                return (T) item;
+                return (IBaseline<TChild, TNewChildKey>)item;
             
-            T baseline = new T();
+            Baseline<TChild, TNewChildKey> baseline = new Baseline<TChild, TNewChildKey>();
             _baselines.Add(key, baseline);
             return baseline;
         }
@@ -78,7 +78,7 @@ namespace BinarySerializer.Serializers.Baselines
         
         public IBaseline Clone()
         {
-            return new Baseline<TKey>(_baselines, _values);
+            return new Baseline<TKey, TChild>(_baselines, _values);
         }
 
         public void Dispose()

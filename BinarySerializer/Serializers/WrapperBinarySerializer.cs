@@ -6,18 +6,20 @@ using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
-    public class WrapperBinarySerializer<T> : IBinarySerializer where T : class, IBaseline, new()
+    public abstract class WrapperBinarySerializer<TKey, TChildKey> : IBinarySerializer<TKey, TChildKey> where TKey : unmanaged where TChildKey : unmanaged
     {
-        private readonly byte _index;
+        private readonly TKey _index;
         private readonly Getter<object> _getter;
         private readonly IBinarySerializer _serializer;
 
-        public WrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer)
+        protected WrapperBinarySerializer(TKey index, Type ownerType, FieldInfo field, IBinarySerializer serializer)
         {
             _index = index;
             _serializer = serializer;
             _getter = new Getter<object>(ownerType, field);
         }
+
+        protected abstract void WriteIndex(TKey index, BinaryDataWriter writer);
 
         public void Update(object obj, BinaryDataReader reader)
         {
@@ -34,22 +36,38 @@ namespace BinarySerializer.Serializers
             
             if (childWriter.Length <= 0)
                 return;
-            
-            writer.WriteByte(_index);
+
+            WriteIndex(_index, writer);
             childWriter.PushNode();
         }
 
-        public void Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
+        void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
-            IBaseline<byte> tBaseline = (IBaseline<byte>) baseline;
+            Serialize(obj, writer, (IBaseline<TKey, TChildKey>)baseline);
+        }
+
+        public void Serialize(object obj, BinaryDataWriter writer, IBaseline<TKey, TChildKey> baseline)
+        {
             BinaryDataWriter childWriter = writer.TryWriteNode(sizeof(byte));
-            _serializer.Serialize(_getter.Get(obj), childWriter, tBaseline.GetOrCreateBaseline<T>(_index));
+            _serializer.Serialize(_getter.Get(obj), childWriter, baseline.GetOrCreateBaseline<TChildKey>(_index));
             
             if (childWriter.Length <= 0)
                 return;
             
-            writer.WriteByte(_index);
+            WriteIndex(_index, writer);
             childWriter.PushNode();
+        }
+    }
+
+    public class ByteWrapperBinarySerializer<TChildKey> : WrapperBinarySerializer<byte, TChildKey> where TChildKey : unmanaged
+    {
+        public ByteWrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer) : base(index, ownerType, field, serializer)
+        {
+        }
+
+        protected override void WriteIndex(byte index, BinaryDataWriter writer)
+        {
+            writer.WriteByte(index);
         }
     }
 }

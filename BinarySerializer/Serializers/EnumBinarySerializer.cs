@@ -23,10 +23,10 @@ namespace BinarySerializer.Serializers
         
         void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
-            Serialize(obj, writer, (IBaseline<byte>) baseline);
+            Serialize(obj, writer, (IBaseline<byte, byte>) baseline);
         }
 
-        protected abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline);
+        protected abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline);
 
         public abstract void Update(object obj, BinaryDataReader reader);
         public abstract void Serialize(object obj, BinaryDataWriter writer);
@@ -53,7 +53,7 @@ namespace BinarySerializer.Serializers
             writer.WriteByte(value);
         }
 
-        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
+        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
         {
             byte value = (byte) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
@@ -87,7 +87,7 @@ namespace BinarySerializer.Serializers
             writer.WriteInt(value);
         }
 
-        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
+        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
         {
             int value = (int) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out int baseValue) && value == default || baseValue == value)
