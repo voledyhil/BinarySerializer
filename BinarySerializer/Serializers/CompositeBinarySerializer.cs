@@ -29,7 +29,7 @@ namespace BinarySerializer.Serializers
             }
         }
 
-        public void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        public void Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
             for (int i = 0; i < _items.Count && i < byte.MaxValue; i++)
             {

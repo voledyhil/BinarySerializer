@@ -7,12 +7,13 @@ namespace BinarySerializer.Serializers
 {
     internal interface ICustomBinarySerializer : IBinarySerializer
     {
-        
+
     }
 
     public abstract class CustomBinarySerializer<T> : ICustomBinarySerializer where T : class
     {
         protected readonly IDictionary<Type, IBinarySerializer> Serializers;
+
         protected CustomBinarySerializer(IDictionary<Type, IBinarySerializer> serializers)
         {
             Serializers = serializers;
@@ -28,13 +29,13 @@ namespace BinarySerializer.Serializers
             Serialize((T) obj, writer);
         }
 
-        void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
             Serialize((T) obj, writer, baseline);
         }
 
         protected abstract void Update(T obj, BinaryDataReader reader);
         protected abstract void Serialize(T obj, BinaryDataWriter writer);
-        protected abstract void Serialize(T obj, BinaryDataWriter writer, Baseline baseline);
+        protected abstract void Serialize(T obj, BinaryDataWriter writer, IBaseline baseline);
     }
 }

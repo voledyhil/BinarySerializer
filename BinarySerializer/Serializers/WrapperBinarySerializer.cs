@@ -6,7 +6,7 @@ using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
-    public class WrapperBinarySerializer : IBinarySerializer
+    public class WrapperBinarySerializer<T> : IBinarySerializer where T : class, IBaseline, new()
     {
         private readonly byte _index;
         private readonly Getter<object> _getter;
@@ -39,10 +39,11 @@ namespace BinarySerializer.Serializers
             childWriter.PushNode();
         }
 
-        public void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        public void Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
+            IBaseline<byte> tBaseline = (IBaseline<byte>) baseline;
             BinaryDataWriter childWriter = writer.TryWriteNode(sizeof(byte));
-            _serializer.Serialize(_getter.Get(obj), childWriter, baseline.GetOrCreateBaseline(_index));
+            _serializer.Serialize(_getter.Get(obj), childWriter, tBaseline.GetOrCreateBaseline<T>(_index));
             
             if (childWriter.Length <= 0)
                 return;

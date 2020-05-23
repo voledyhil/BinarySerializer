@@ -3,38 +3,50 @@ using System.Collections.Generic;
 
 namespace BinarySerializer.Serializers.Baselines
 {
-    public class Baseline : ICloneable, IDisposable
+    public interface IBaseline : ICloneable, IDisposable
     {
-        public IEnumerable<object> BaselineKeys => _baselines.Keys;
+        new IBaseline Clone();
+    }
+
+    public interface IBaseline<TKey> : IBaseline where TKey : unmanaged
+    {
+        IEnumerable<TKey> BaselineKeys { get; }
+        bool TryGetValue<T>(TKey key, out T value);
+        T GetOrCreateBaseline<T>(TKey key) where T : class, IBaseline, new();
+        object this[TKey key] { get; set; }
+        void DestroyBaseline(TKey key);
+    }
+
+    public class Baseline<TKey> : IBaseline<TKey> where TKey : unmanaged
+    {
+        public IEnumerable<TKey> BaselineKeys => _baselines.Keys;
         
-        private Dictionary<object, Baseline> _baselines;
-        private Dictionary<object, object> _values;
+        private Dictionary<TKey, IBaseline> _baselines;
+        private Dictionary<TKey, object> _values;
 
         public Baseline()
         {
-            _baselines = new Dictionary<object, Baseline>();
-            _values = new Dictionary<object, object>();
+            _baselines = new Dictionary<TKey, IBaseline>();
+            _values = new Dictionary<TKey, object>();
         }
         
-        private Baseline(IDictionary<object, Baseline> baselines, IDictionary<object, object> values)
+        private Baseline(IDictionary<TKey, IBaseline> baselines, IDictionary<TKey, object> values)
         {
-            _values = new Dictionary<object, object>(values);
-            _baselines = new Dictionary<object, Baseline>();
-            foreach (KeyValuePair<object, Baseline> item in baselines)
+            _values = new Dictionary<TKey, object>(values);
+            _baselines = new Dictionary<TKey, IBaseline>();
+            foreach (KeyValuePair<TKey, IBaseline> item in baselines)
             {
-                Baseline value = item.Value.Clone();
-                if (value != null)
-                    _baselines.Add(item.Key, value);
+                _baselines.Add(item.Key, (IBaseline)item.Value.Clone());
             }
         }
 
-        public object this[object key]
+        public object this[TKey key]
         {
             get => _values[key];
             set => _values[key] = value;
         }
 
-        public bool TryGetValue<T>(object key, out T value)
+        public bool TryGetValue<T>(TKey key, out T value)
         {
             value = default;
             if (!_values.TryGetValue(key, out object objValue)) 
@@ -44,17 +56,17 @@ namespace BinarySerializer.Serializers.Baselines
             return true;
         }
         
-        public Baseline GetOrCreateBaseline(object key)
+        public T GetOrCreateBaseline<T>(TKey key) where T : class, IBaseline, new()
         {
-            if (_baselines.TryGetValue(key, out Baseline item))
-                return item;
+            if (_baselines.TryGetValue(key, out IBaseline item))
+                return (T) item;
             
-            Baseline baseline = new Baseline();
+            T baseline = new T();
             _baselines.Add(key, baseline);
             return baseline;
         }
 
-        public void DestroyBaseline(object key)
+        public void DestroyBaseline(TKey key)
         {
             _baselines.Remove(key);
         }
@@ -64,9 +76,9 @@ namespace BinarySerializer.Serializers.Baselines
             return Clone();
         }
         
-        public Baseline Clone()
+        public IBaseline Clone()
         {
-            return new Baseline(_baselines, _values);
+            return new Baseline<TKey>(_baselines, _values);
         }
 
         public void Dispose()

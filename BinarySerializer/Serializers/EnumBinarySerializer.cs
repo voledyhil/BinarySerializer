@@ -20,10 +20,16 @@ namespace BinarySerializer.Serializers
             Getter = new Getter<object>(ownerType, field);
             Setter = new Setter<object>(ownerType, field);
         }
+        
+        void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
+        {
+            Serialize(obj, writer, (IBaseline<byte>) baseline);
+        }
+
+        protected abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline);
 
         public abstract void Update(object obj, BinaryDataReader reader);
         public abstract void Serialize(object obj, BinaryDataWriter writer);
-        public abstract void Serialize(object obj, BinaryDataWriter writer, Baseline baseline);
     }
 
     public class ByteEnumBinarySerializer : EnumBinarySerializer
@@ -47,7 +53,7 @@ namespace BinarySerializer.Serializers
             writer.WriteByte(value);
         }
 
-        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
             byte value = (byte) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
@@ -80,8 +86,8 @@ namespace BinarySerializer.Serializers
             writer.WriteByte(Index);
             writer.WriteInt(value);
         }
-        
-        public override void Serialize(object obj, BinaryDataWriter writer, Baseline baseline)
+
+        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
             int value = (int) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out int baseValue) && value == default || baseValue == value)
