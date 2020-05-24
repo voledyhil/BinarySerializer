@@ -6,7 +6,7 @@ using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
-    public abstract class EnumBinarySerializer : IBinarySerializer
+    public abstract class EnumBinarySerializer : IBinarySerializer<byte, byte>
     {
         protected readonly byte Index;
         protected readonly FieldInfo Field;
@@ -26,10 +26,10 @@ namespace BinarySerializer.Serializers
             Serialize(obj, writer, (IBaseline<byte, byte>) baseline);
         }
 
-        protected abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline);
-
         public abstract void Update(object obj, BinaryDataReader reader);
-        public abstract void Serialize(object obj, BinaryDataWriter writer);
+        public abstract void Serialize(object obj, BinaryDataWriter writer);        
+        public abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline);
+
     }
 
     public class ByteEnumBinarySerializer : EnumBinarySerializer
@@ -53,7 +53,7 @@ namespace BinarySerializer.Serializers
             writer.WriteByte(value);
         }
 
-        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
+        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
         {
             byte value = (byte) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
@@ -87,7 +87,7 @@ namespace BinarySerializer.Serializers
             writer.WriteInt(value);
         }
 
-        protected override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
+        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte, byte> baseline)
         {
             int value = (int) Getter.Get(obj);
             if (!baseline.TryGetValue(Index, out int baseValue) && value == default || baseValue == value)
