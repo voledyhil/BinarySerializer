@@ -1,3 +1,4 @@
+using System;
 using BinarySerializer.Serializers.Baselines;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -498,7 +499,6 @@ namespace BinarySerializer.Tests
             Assert.AreEqual(source.ByteObjects[0], target.ByteObjects[0]);
             Assert.AreEqual(source.ByteObjects[1], target.ByteObjects[1]);
             Assert.AreEqual(source.ByteObjects[3], target.ByteObjects[3]);
-            
         }
     }
 }

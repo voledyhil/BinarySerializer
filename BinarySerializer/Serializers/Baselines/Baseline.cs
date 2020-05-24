@@ -6,19 +6,21 @@ namespace BinarySerializer.Serializers.Baselines
     public interface IBaseline : ICloneable, IDisposable
     {
         new IBaseline Clone();
+        bool HasValues { get; }
+        void CreateValues(int size);
     }
 
     public interface IBaseline<TKey> : IBaseline where TKey : unmanaged
     {
         IEnumerable<TKey> BaselineKeys { get; }
-        bool TryGetValue(TKey key, out int value);
-        T GetOrCreateBaseline<T>(TKey key, out bool isNew) where T : class, IBaseline, new();
-        int this[TKey key] { get; set; }
+        T GetOrCreateBaseline<T>(TKey key,  int valuesSize, out bool isNew) where T : class, IBaseline, new();
+        int this[byte key] { get; set; }
         void DestroyBaseline(TKey key);
     }
 
     public class Baseline<TKey> : IBaseline<TKey> where TKey : unmanaged
     {
+        public bool HasValues => _values != null;
         public IEnumerable<TKey> BaselineKeys
         {
             get
@@ -29,19 +31,26 @@ namespace BinarySerializer.Serializers.Baselines
                 return _baselines.Keys;
             }
         }
+        
+        public int this[byte key]
+        {
+            get => _values[key];
+            set => _values[key] = value;
+        }
 
         private Dictionary<TKey, IBaseline> _baselines;
-        private Dictionary<TKey, int> _values;
+        private int[] _values;
 
         public Baseline()
         {
         }
         
-        private Baseline(IDictionary<TKey, IBaseline> baselines, IDictionary<TKey, int> values)
+        private Baseline(IDictionary<TKey, IBaseline> baselines, int[] values)
         {
             if (values != null)
             {
-                _values = new Dictionary<TKey, int>(values);
+                _values = new int[values.Length];
+                Array.Copy(values, _values, values.Length);
             }
 
             if (baselines != null)
@@ -54,28 +63,7 @@ namespace BinarySerializer.Serializers.Baselines
             }
         }
 
-        public int this[TKey key]
-        {
-            get => _values[key];
-            set
-            {
-                if (_values == null)
-                    _values = new Dictionary<TKey, int>();
-                
-                _values[key] = value;
-            }
-        }
-
-        public bool TryGetValue(TKey key, out int value)
-        {
-            if (_values == null)
-                _values = new Dictionary<TKey, int>();
-
-            value = default;
-            return _values.TryGetValue(key, out value);
-        }
-        
-        public T GetOrCreateBaseline<T>(TKey key, out bool isNew) where T : class, IBaseline, new()
+        public T GetOrCreateBaseline<T>(TKey key, int valuesSize, out bool isNew) where T : class, IBaseline, new()
         {
             if (_baselines == null)
                 _baselines = new Dictionary<TKey, IBaseline>();
@@ -86,6 +74,8 @@ namespace BinarySerializer.Serializers.Baselines
 
             isNew = true;
             T baseline = new T();
+            baseline.CreateValues(valuesSize);
+            
             _baselines.Add(key, baseline);
             return baseline;
         }
@@ -98,6 +88,15 @@ namespace BinarySerializer.Serializers.Baselines
         object ICloneable.Clone()
         {
             return Clone();
+        }
+
+        public void CreateValues(int size)
+        {
+            if (_values != null)
+                throw new InvalidOperationException();
+
+            if (size > 0)
+                _values = new int[size];
         }
         
         public IBaseline Clone()
@@ -112,12 +111,7 @@ namespace BinarySerializer.Serializers.Baselines
                 _baselines.Clear();
                 _baselines = null;
             }
-
-            if (_values != null)
-            {
-                _values.Clear();
-                _values = null;
-            }
+            _values = null;
         }
     }
 }

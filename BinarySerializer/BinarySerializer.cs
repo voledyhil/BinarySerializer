@@ -11,48 +11,46 @@ namespace BinarySerializer
 {
     public static class BinarySerializer
     {
-        private static readonly IDictionary<Type, IBinarySerializer> Serializers = new Dictionary<Type, IBinarySerializer>();
+        private static readonly IDictionary<Type, CompositeBinarySerializer> Serializers = new Dictionary<Type, CompositeBinarySerializer>();
         private static readonly IDictionary<Type, Creator> Creators = new Dictionary<Type, Creator>();
 
         public static byte[] Serialize(object obj)
         {
-            Type ownerType = obj.GetType();
-            if (!Serializers.TryGetValue(ownerType, out IBinarySerializer item))
-                item = Register(ownerType);
-
             using (BinaryDataWriter writer = new BinaryDataWriter())
             {
-                item.Serialize(obj, writer);
+                GetSerializer(obj.GetType()).Serialize(obj, writer);
                 return writer.GetData();
             }
         }
 
         public static byte[] Serialize(object obj, Baseline<byte> baseline)
         {
-            Type ownerType = obj.GetType();
-            if (!Serializers.TryGetValue(ownerType, out IBinarySerializer item))
-                item = Register(ownerType);
+            CompositeBinarySerializer serializer = GetSerializer(obj.GetType());
+            
+            if (!baseline.HasValues)
+                baseline.CreateValues(serializer.Count);
 
             using (BinaryDataWriter writer = new BinaryDataWriter())
             {
-                item.Serialize(obj, writer, baseline);
+                serializer.Serialize(obj, writer, baseline);
                 return writer.GetData();
             }
         }
 
         public static void Deserialize(object obj, byte[] data)
         {
-            Type ownerType = obj.GetType();
-            if (!Serializers.TryGetValue(ownerType, out IBinarySerializer item))
-                item = Register(ownerType);
-
             using (BinaryDataReader reader = new BinaryDataReader(data))
             {
-                item.Update(obj, reader);
+                GetSerializer(obj.GetType()).Update(obj, reader);
             }
         }
 
-        private static IBinarySerializer Register(Type ownerType)
+        public static CompositeBinarySerializer GetSerializer(Type type)
+        {
+            return Serializers.TryGetValue(type, out CompositeBinarySerializer item) ? item : RegisterType(type);
+        }
+
+        public static CompositeBinarySerializer RegisterType(Type ownerType)
         {
             FieldInfo[] fields = ownerType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             List<IBinarySerializer> serializers = new List<IBinarySerializer>(fields.Length);
@@ -143,14 +141,13 @@ namespace BinarySerializer
                 }
                 else if (fieldType.IsClass)
                 {
-                    if (Serializers.TryGetValue(fieldType, out IBinarySerializer childSer)) 
+                    if (Serializers.ContainsKey(fieldType))
                         continue;
                     
                     if (typeof(IBinaryObjectCollection).IsAssignableFrom(fieldType))
                     {
                         Type valueType = fieldType.GenericTypeArguments[0];
-                        if (!Serializers.TryGetValue(valueType, out IBinarySerializer valueSer))
-                            valueSer = Register(valueType);
+                        CompositeBinarySerializer valueSer = GetSerializer(valueType);
 
                         if (!Creators.TryGetValue(valueType, out Creator itemCreator))
                         {
@@ -158,61 +155,49 @@ namespace BinarySerializer
                             Creators.Add(valueType, itemCreator);
                         }
 
+                        IBinarySerializer ser;
                         if (typeof(IBinaryObjectCollection<byte>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryByteKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
+                            ser = new DictionaryByteKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<short>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryShortKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<short>(index, ownerType, field, childSer));
+                            ser = new DictionaryShortKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<short>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<ushort>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<ushort>(index, ownerType, field, childSer));
+                            ser = new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<ushort>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<int>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryIntKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<int>(index, ownerType, field, childSer));
+                            ser = new DictionaryIntKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<int>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<uint>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<uint>(index, ownerType, field, childSer));
+                            ser = new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<uint>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<long>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryLongKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<long>(index, ownerType, field, childSer));
+                            ser = new DictionaryLongKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<long>(index, ownerType, field, ser, 0));
                         }
                         else if (typeof(IBinaryObjectCollection<ulong>).IsAssignableFrom(fieldType))
                         {
-                            childSer = new DictionaryULongKeyBinarySerializer(itemCreator, valueSer);
-                            serializers.Add(new ByteWrapperBinarySerializer<ulong>(index, ownerType, field, childSer));
+                            ser = new DictionaryULongKeyBinarySerializer(itemCreator, valueSer);
+                            serializers.Add(new ByteWrapperBinarySerializer<ulong>(index, ownerType, field, ser, 0));
                         }
                         else throw new ArgumentException();
 
                     }
-                    else if (attr.CustomSerializer != null)
-                    {
-                        if (!Creators.TryGetValue(attr.CustomSerializer, out Creator creator))
-                        {
-                            creator = new Creator(attr.CustomSerializer.GetConstructor(new[] {Serializers.GetType()}));
-                            Creators.Add(attr.CustomSerializer, creator);
-                        }
-
-                        childSer = (ICustomBinarySerializer) creator.Create(Serializers);
-                        Serializers.Add(fieldType, childSer);
-
-                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
-                    }
                     else
                     {
-                        childSer = Register(fieldType);
-                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, childSer));
+                        CompositeBinarySerializer ser = RegisterType(fieldType);
+                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, ser, ser.Count));
                     }
                 }
                 else throw new ArgumentException();

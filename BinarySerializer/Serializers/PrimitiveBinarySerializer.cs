@@ -60,7 +60,8 @@ namespace BinarySerializer.Serializers
         {
             bool value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -98,7 +99,8 @@ namespace BinarySerializer.Serializers
         {
             byte value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -136,7 +138,8 @@ namespace BinarySerializer.Serializers
         {
             char value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -178,9 +181,11 @@ namespace BinarySerializer.Serializers
         {
             double value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && Math.Abs(value) < 1e-6 || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && Math.Abs(value) < 1e-6 || baseHash == hash)
                 return;
             baseline[Index] = hash;
+            
             writer.WriteByte(Index);
             writer.WriteDouble(value);
         }
@@ -216,7 +221,8 @@ namespace BinarySerializer.Serializers
         {
             float value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && Math.Abs(value) < 1e-6 || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && Math.Abs(value) < 1e-6 || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -254,7 +260,8 @@ namespace BinarySerializer.Serializers
         {
             int value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -292,7 +299,8 @@ namespace BinarySerializer.Serializers
         {
             long value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -330,7 +338,8 @@ namespace BinarySerializer.Serializers
         {
             sbyte value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -368,7 +377,8 @@ namespace BinarySerializer.Serializers
         {
             short value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -406,7 +416,8 @@ namespace BinarySerializer.Serializers
         {
             float value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && Math.Abs(value) < 1e-6 || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && Math.Abs(value) < 1e-6 || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -461,9 +472,11 @@ namespace BinarySerializer.Serializers
         {
             string value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && string.IsNullOrEmpty(value) || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && string.IsNullOrEmpty(value) || baseHash == hash)
                 return;
             baseline[Index] = hash;
+            
             writer.WriteByte(Index);
             writer.WriteString(value);
         }
@@ -499,7 +512,8 @@ namespace BinarySerializer.Serializers
         {
             uint value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -537,7 +551,8 @@ namespace BinarySerializer.Serializers
         {
             ulong value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);
@@ -575,7 +590,8 @@ namespace BinarySerializer.Serializers
         {
             ushort value = Getter.Get(obj);
             int hash = GetHashCode(value);
-            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == hash)
+            int baseHash = baseline[Index];
+            if (baseHash == 0 && value == default || baseHash == hash)
                 return;
             baseline[Index] = hash;
             writer.WriteByte(Index);

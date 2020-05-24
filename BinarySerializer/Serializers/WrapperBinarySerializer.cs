@@ -12,11 +12,13 @@ namespace BinarySerializer.Serializers
         private readonly TKey _index;
         private readonly Getter<object> _getter;
         private readonly IBinarySerializer _serializer;
+        private readonly int _valuesCount;
 
-        protected WrapperBinarySerializer(TKey index, Type ownerType, FieldInfo field, IBinarySerializer serializer)
+        protected WrapperBinarySerializer(TKey index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount)
         {
             _index = index;
             _serializer = serializer;
+            _valuesCount = valuesCount;
             _getter = new Getter<object>(ownerType, field);
         }
 
@@ -50,8 +52,7 @@ namespace BinarySerializer.Serializers
         public void Serialize(object obj, BinaryDataWriter writer, IBaseline<TKey> baseline)
         {
             BinaryDataWriter childWriter = writer.TryWriteNode(sizeof(byte));
-            Baseline<TChildKey> itemBaseline =
-                baseline.GetOrCreateBaseline<Baseline<TChildKey>>(_index, out bool isNew);
+            Baseline<TChildKey> itemBaseline = baseline.GetOrCreateBaseline<Baseline<TChildKey>>(_index, _valuesCount, out bool isNew);
             _serializer.Serialize(_getter.Get(obj), childWriter, itemBaseline);
 
             if (childWriter.Length <= 0 && !isNew)
@@ -65,8 +66,8 @@ namespace BinarySerializer.Serializers
     public class ByteWrapperBinarySerializer<TChildKey> : WrapperBinarySerializer<byte, TChildKey>
         where TChildKey : unmanaged
     {
-        public ByteWrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer) :
-            base(index, ownerType, field, serializer)
+        public ByteWrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount) :
+            base(index, ownerType, field, serializer, valuesCount)
         {
         }
 

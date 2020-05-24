@@ -6,6 +6,7 @@ namespace BinarySerializer.Serializers
 {
     public class CompositeBinarySerializer : IBinarySerializer
     {
+        public int Count => _items.Count;
         private readonly List<IBinarySerializer> _items;
 
         public CompositeBinarySerializer(List<IBinarySerializer> items)
