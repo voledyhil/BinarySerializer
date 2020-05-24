@@ -1,3 +1,4 @@
+using BinarySerializer.Serializers;
 using BinarySerializer.Serializers.Baselines;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -65,7 +66,7 @@ namespace BinarySerializer.Tests
                 // total 47 bytes
             };
 
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
             Assert.AreEqual(60, data.Length); // fields data + indices data (47 + 13) 
             
@@ -116,7 +117,7 @@ namespace BinarySerializer.Tests
         public void SerializeStringBaselineTest()
         {
             PrimitivesMock source = new PrimitivesMock {String = "DotNet"};
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
 
             Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
@@ -165,7 +166,7 @@ namespace BinarySerializer.Tests
                 IntEnum = IntEnum.Second // 4 byte
             };
             
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
 
             Assert.AreEqual(7, data.Length); // fields data + indices data (5 + 2) 
@@ -208,7 +209,7 @@ namespace BinarySerializer.Tests
                 ShortFloatProperty = {Value = 1.5f}            //13. 2 byte
             };
 
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
             
             Assert.AreEqual(60, data.Length); // fields data + indices data (47 + 13) 
@@ -278,7 +279,7 @@ namespace BinarySerializer.Tests
                 }
             };
 
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
             
             Assert.AreEqual(10, data.Length); // parent index + child len + child indices + child data (1 + 2 + 2 + 5) 
@@ -513,9 +514,9 @@ namespace BinarySerializer.Tests
             source.ByteObjects.Add(1, new ChildMock {Bool = true});
             source.ByteObjects.Add(3, new ChildMock());
 
-            Baseline baseline = new Baseline();
+            Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
-            Assert.AreEqual(19, data.Length);
+            Assert.AreEqual(19 + 6 * 3, data.Length);
             
             CollectionsMock target = new CollectionsMock();
             BinarySerializer.Deserialize(target, data);

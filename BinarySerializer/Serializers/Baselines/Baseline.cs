@@ -8,16 +8,16 @@ namespace BinarySerializer.Serializers.Baselines
         new IBaseline Clone();
     }
 
-    public interface IBaseline<TKey, TChildKey> : IBaseline where TKey : unmanaged where TChildKey : unmanaged
+    public interface IBaseline<TKey> : IBaseline where TKey : unmanaged
     {
         IEnumerable<TKey> BaselineKeys { get; }
         bool TryGetValue<TValue>(TKey key, out TValue value);
-        IBaseline<TChildKey, TNewChildKey> GetOrCreateBaseline<TNewChildKey>(TKey key) where TNewChildKey : unmanaged;
+        T GetOrCreateBaseline<T>(TKey key, out bool isNew) where T : class, IBaseline, new();
         object this[TKey key] { get; set; }
         void DestroyBaseline(TKey key);
     }
 
-    public class Baseline<TKey, TChild> : IBaseline<TKey, TChild> where TKey : unmanaged where TChild : unmanaged
+    public class Baseline<TKey> : IBaseline<TKey> where TKey : unmanaged
     {
         public IEnumerable<TKey> BaselineKeys => _baselines.Keys;
         
@@ -56,12 +56,14 @@ namespace BinarySerializer.Serializers.Baselines
             return true;
         }
         
-        public IBaseline<TChild, TNewChildKey> GetOrCreateBaseline<TNewChildKey>(TKey key) where TNewChildKey : unmanaged
+        public T GetOrCreateBaseline<T>(TKey key, out bool isNew) where T : class, IBaseline, new()
         {
+            isNew = false;
             if (_baselines.TryGetValue(key, out IBaseline item))
-                return (IBaseline<TChild, TNewChildKey>)item;
-            
-            Baseline<TChild, TNewChildKey> baseline = new Baseline<TChild, TNewChildKey>();
+                return (T)item;
+
+            isNew = true;
+            T baseline = new T();
             _baselines.Add(key, baseline);
             return baseline;
         }
@@ -78,7 +80,7 @@ namespace BinarySerializer.Serializers.Baselines
         
         public IBaseline Clone()
         {
-            return new Baseline<TKey, TChild>(_baselines, _values);
+            return new Baseline<TKey>(_baselines, _values);
         }
 
         public void Dispose()
