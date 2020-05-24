@@ -1,4 +1,3 @@
-using BinarySerializer.Serializers;
 using BinarySerializer.Serializers.Baselines;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -112,32 +111,6 @@ namespace BinarySerializer.Tests
             
             Assert.AreEqual(source, target);
         }
-        
-        [TestMethod]
-        public void SerializeStringBaselineTest()
-        {
-            PrimitivesMock source = new PrimitivesMock {String = "DotNet"};
-            Baseline<byte> baseline = new Baseline<byte>();
-            byte[] data = BinarySerializer.Serialize(source, baseline);
-
-            Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
-
-            PrimitivesMock target = new PrimitivesMock();
-            BinarySerializer.Deserialize(target, data); 
-            Assert.AreEqual(source, target);
-            
-            data = BinarySerializer.Serialize(source, baseline);
-            Assert.AreEqual(0, data.Length); 
-            BinarySerializer.Deserialize(target, data); 
-            Assert.AreEqual(source, target);
-
-            source.String = "NetDot";
-            data = BinarySerializer.Serialize(source, baseline);
-            Assert.AreEqual(8, data.Length); 
-            BinarySerializer.Deserialize(target, data); 
-            Assert.AreEqual(source, target);
-        }
-        
        
         [TestMethod]
         public void SerializeEnumTest()

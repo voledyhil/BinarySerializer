@@ -56,11 +56,12 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
             byte value = (byte) Getter.Get(obj);
-            if (!baseline.TryGetValue(Index, out byte baseValue) && value == default || baseValue == value)
+            
+            int valueHash = value.GetHashCode();
+            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == valueHash)
                 return;
-
-            baseline[Index] = value;
-
+            baseline[Index] = valueHash;
+            
             writer.WriteByte(Index);
             writer.WriteByte(value);
         }
@@ -90,10 +91,10 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
             int value = (int) Getter.Get(obj);
-            if (!baseline.TryGetValue(Index, out int baseValue) && value == default || baseValue == value)
+            int valueHash = value.GetHashCode();
+            if (!baseline.TryGetValue(Index, out int baseHash) && value == default || baseHash == valueHash)
                 return;
-
-            baseline[Index] = value;
+            baseline[Index] = valueHash;
 
             writer.WriteByte(Index);
             writer.WriteInt(value);
