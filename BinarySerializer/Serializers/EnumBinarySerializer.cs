@@ -57,11 +57,11 @@ namespace BinarySerializer.Serializers
         {
             byte value = (byte) Getter.Get(obj);
 
-            int valueHash = Convert.ToInt32(value);
             int baseHash = baseline[Index];
-            if (baseHash == 0 && value == default || baseHash == valueHash)
+            if (baseHash == 0 && value == default || baseHash == value)
                 return;
-            baseline[Index] = valueHash;
+            
+            baseline[Index] = value;
             
             writer.WriteByte(Index);
             writer.WriteByte(value);
@@ -92,11 +92,11 @@ namespace BinarySerializer.Serializers
         public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
             int value = (int) Getter.Get(obj);
-            int valueHash = Convert.ToInt32(value);
             int baseHash = baseline[Index];
-            if (baseHash == 0 && value == default || baseHash == valueHash)
+            if (baseHash == 0 && value == default || baseHash == value)
                 return;
-            baseline[Index] = valueHash;
+            
+            baseline[Index] = value;
 
             writer.WriteByte(Index);
             writer.WriteInt(value);
