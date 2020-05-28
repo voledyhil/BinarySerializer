@@ -3,7 +3,7 @@ using BinarySerializer.Properties;
 using BinarySerializer.Serializers;
 
 namespace BinarySerializer.Tests
-{
+{   
     public class ParentMock : IEquatable<ParentMock>
     {
         [BinaryItem] public ChildMock ChildMock = new ChildMock();
@@ -169,32 +169,29 @@ namespace BinarySerializer.Tests
         [BinaryItem] public Property<char> CharProperty = new Property<char>();
         [BinaryItem] public Property<float> FloatProperty = new Property<float>();
         [BinaryItem(true)] public Property<float> ShortFloatProperty = new Property<float>();
+        [BinaryItem] public Property<string> StringProperty = new Property<string>();
 
         public bool Equals(PropertiesMock other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(BoolProperty, other.BoolProperty) && Equals(ByteProperty, other.ByteProperty) &&
-                   Equals(SbyteProperty, other.SbyteProperty) && Equals(ShortProperty, other.ShortProperty) &&
-                   Equals(UShortProperty, other.UShortProperty) && Equals(IntProperty, other.IntProperty) &&
-                   Equals(UIntProperty, other.UIntProperty) && Equals(LongProperty, other.LongProperty) &&
-                   Equals(ULongProperty, other.ULongProperty) && Equals(DoubleProperty, other.DoubleProperty) &&
-                   Equals(CharProperty, other.CharProperty) && Equals(FloatProperty, other.FloatProperty) &&
-                   Equals(ShortFloatProperty, other.ShortFloatProperty);
+            return Equals(BoolProperty, other.BoolProperty) && Equals(ByteProperty, other.ByteProperty) && Equals(SbyteProperty, other.SbyteProperty) && Equals(ShortProperty, other.ShortProperty) && Equals(UShortProperty, other.UShortProperty) && Equals(IntProperty, other.IntProperty) && Equals(UIntProperty, other.UIntProperty) && Equals(LongProperty, other.LongProperty) && Equals(ULongProperty, other.ULongProperty) && Equals(DoubleProperty, other.DoubleProperty) && Equals(CharProperty, other.CharProperty) && Equals(FloatProperty, other.FloatProperty) && Equals(ShortFloatProperty, other.ShortFloatProperty) && Equals(StringProperty, other.StringProperty);
+            
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((PropertiesMock) obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((PropertiesMock) obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int hashCode = BoolProperty != null ? BoolProperty.GetHashCode() : 0;
+                int hashCode = (BoolProperty != null ? BoolProperty.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ByteProperty != null ? ByteProperty.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (SbyteProperty != null ? SbyteProperty.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ShortProperty != null ? ShortProperty.GetHashCode() : 0);
@@ -207,6 +204,7 @@ namespace BinarySerializer.Tests
                 hashCode = (hashCode * 397) ^ (CharProperty != null ? CharProperty.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (FloatProperty != null ? FloatProperty.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (ShortFloatProperty != null ? ShortFloatProperty.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (StringProperty != null ? StringProperty.GetHashCode() : 0);
                 return hashCode;
             }
         }

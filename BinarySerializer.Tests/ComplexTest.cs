@@ -7,13 +7,13 @@ namespace BinarySerializer.Tests
     [TestClass]
     public class ComplexTest
     {
-        public class NodeA
+        private class NodeA
         {
             [BinaryItem]
             public readonly ByteBinaryObjectCollection<NodeB> Objects = new ByteBinaryObjectCollection<NodeB>();
         }
-        
-        public class NodeB
+
+        private class NodeB
         {
             [BinaryItem]
             public readonly ByteBinaryObjectCollection<ChildMock> Objects = new ByteBinaryObjectCollection<ChildMock>();    
@@ -40,6 +40,13 @@ namespace BinarySerializer.Tests
             Assert.AreEqual(source.Objects[0].Objects[0], target.Objects[0].Objects[0]);
             
             data = BinarySerializer.Serialize(source, baseline);
+            Assert.AreEqual(0, data.Length);
+        }
+        
+        [TestMethod]
+        public void SerializeEmptyTest()
+        {
+            byte[] data = BinarySerializer.Serialize(new PrimitivesMock());
             Assert.AreEqual(0, data.Length);
         }
     }

@@ -13,7 +13,7 @@ namespace BinarySerializer.Serializers.Baselines
     public interface IBaseline<TKey> : IBaseline where TKey : unmanaged
     {
         IEnumerable<TKey> BaselineKeys { get; }
-        T GetOrCreateBaseline<T>(TKey key,  int valuesSize, out bool isNew) where T : class, IBaseline, new();
+        T GetOrCreateBaseline<T>(TKey key, int valuesSize, out bool isNew) where T : class, IBaseline, new();
         int this[byte key] { get; set; }
         void DestroyBaseline(TKey key);
     }
@@ -21,17 +21,18 @@ namespace BinarySerializer.Serializers.Baselines
     public class Baseline<TKey> : IBaseline<TKey> where TKey : unmanaged
     {
         public bool HasValues => _values != null;
+
         public IEnumerable<TKey> BaselineKeys
         {
             get
             {
                 if (_baselines == null)
                     _baselines = new Dictionary<TKey, IBaseline>();
-                
+
                 return _baselines.Keys;
             }
         }
-        
+
         public int this[byte key]
         {
             get => _values[key];
@@ -44,7 +45,7 @@ namespace BinarySerializer.Serializers.Baselines
         public Baseline()
         {
         }
-        
+
         private Baseline(IDictionary<TKey, IBaseline> baselines, int[] values)
         {
             if (values != null)
@@ -67,15 +68,15 @@ namespace BinarySerializer.Serializers.Baselines
         {
             if (_baselines == null)
                 _baselines = new Dictionary<TKey, IBaseline>();
-            
+
             isNew = false;
             if (_baselines.TryGetValue(key, out IBaseline item))
-                return (T)item;
+                return (T) item;
 
             isNew = true;
             T baseline = new T();
             baseline.CreateValues(valuesSize);
-            
+
             _baselines.Add(key, baseline);
             return baseline;
         }
@@ -98,7 +99,7 @@ namespace BinarySerializer.Serializers.Baselines
             if (size > 0)
                 _values = new int[size];
         }
-        
+
         public IBaseline Clone()
         {
             return new Baseline<TKey>(_baselines, _values);
@@ -111,6 +112,7 @@ namespace BinarySerializer.Serializers.Baselines
                 _baselines.Clear();
                 _baselines = null;
             }
+
             _values = null;
         }
     }

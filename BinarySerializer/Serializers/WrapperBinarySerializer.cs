@@ -14,7 +14,7 @@ namespace BinarySerializer.Serializers
         private readonly IBinarySerializer _serializer;
         private readonly int _valuesCount;
 
-        protected WrapperBinarySerializer(TKey index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount)
+        protected WrapperBinarySerializer(TKey index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount = 0)
         {
             _index = index;
             _serializer = serializer;
@@ -66,7 +66,7 @@ namespace BinarySerializer.Serializers
     public class ByteWrapperBinarySerializer<TChildKey> : WrapperBinarySerializer<byte, TChildKey>
         where TChildKey : unmanaged
     {
-        public ByteWrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount) :
+        public ByteWrapperBinarySerializer(byte index, Type ownerType, FieldInfo field, IBinarySerializer serializer, int valuesCount = 0) :
             base(index, ownerType, field, serializer, valuesCount)
         {
         }

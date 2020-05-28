@@ -7,488 +7,161 @@ using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
 {
-    public abstract class PropertyBinarySerializer<T> : IBinarySerializer<byte>
+    public abstract class PropertyBinarySerializer<T, TWriter> : IBinarySerializer<byte>
+        where TWriter : IPrimitiveWriter<T>
     {
-        protected readonly byte Index;
-        protected readonly Getter<Property<T>> Getter;
+        private readonly byte _index;
+        private readonly Getter<Property<T>> _getter;
+        private readonly TWriter _writer;
 
-        protected PropertyBinarySerializer(byte index, Type ownerType, FieldInfo field)
+        protected PropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, TWriter writer)
         {
-            Index = index;
-            Getter = new Getter<Property<T>>(ownerType, field);
+            _index = index;
+            _writer = writer;
+            _getter = new Getter<Property<T>>(ownerType, field);
         }
-        
+
         void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
             Serialize(obj, writer, (IBaseline<byte>) baseline);
         }
 
-        public abstract void Update(object obj, BinaryDataReader reader);
-        public abstract void Serialize(object obj, BinaryDataWriter writer);        
-        public abstract void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline);
-    }
-    
-    
-    public class BoolPropertyBinarySerializer : PropertyBinarySerializer<bool>
-    {
-        public BoolPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public void Update(object obj, BinaryDataReader reader)
         {
+            _getter.Get(obj).Update(_writer.Read(reader));
         }
 
-        public override void Update(object obj, BinaryDataReader reader)
+        public void Serialize(object obj, BinaryDataWriter writer)
         {
-            Getter.Get(obj).Update(reader.ReadBool());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<bool> property = Getter.Get(obj);
-            if (property.Value == default)
+            Property<T> property = _getter.Get(obj);
+            if (_writer.Equals(property.Value, default))
                 return;
-            
-            writer.WriteByte(Index);
-            writer.WriteBool(property.Value);
+
+            writer.WriteByte(_index);
+            _writer.Write(writer, property.Value);
         }
 
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
+        public void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
-            Property<bool> property = Getter.Get(obj);
-            
-            if (baseline[Index] == property.Version)
+            Property<T> property = _getter.Get(obj);
+            if (baseline[_index] == property.Version)
                 return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteBool(property.Value);
+
+            baseline[_index] = property.Version;
+            writer.WriteByte(_index);
+            _writer.Write(writer, property.Value);
         }
     }
-    
-    public class IntPropertyBinarySerializer : PropertyBinarySerializer<int>
+
+    public sealed class BoolPropertyBinarySerializer : PropertyBinarySerializer<bool, BoolWriter>
     {
-        public IntPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public BoolPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, BoolWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadInt());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<int> property = Getter.Get(obj);
-            if (property.Value == default)
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteInt(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<int> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteInt(property.Value);
         }
     }
-    
-    public class BytePropertyBinarySerializer : PropertyBinarySerializer<byte>
+
+    public sealed class BytePropertyBinarySerializer : PropertyBinarySerializer<byte, ByteWriter>
     {
-        public BytePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public BytePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, ByteWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadByte());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<byte> property = Getter.Get(obj);
-            if (property.Value == default)
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteByte(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<byte> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteByte(property.Value);
         }
     }
-    
-    public class CharPropertyBinarySerializer : PropertyBinarySerializer<char>
+
+    public sealed class SBytePropertyBinarySerializer : PropertyBinarySerializer<sbyte, SByteWriter>
     {
-        public CharPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public SBytePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, SByteWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadChar());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<char> property = Getter.Get(obj);
-            if (property.Value == default)
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteChar(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<char> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteChar(property.Value);
         }
     }
-    
-    public class DoublePropertyBinarySerializer : PropertyBinarySerializer<double>
+
+    public sealed class ShortPropertyBinarySerializer : PropertyBinarySerializer<short, ShortWriter>
     {
-        public DoublePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public ShortPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, ShortWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadDouble());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<double> property = Getter.Get(obj);
-            if (Math.Abs(property.Value) < 1e-6)
-                return;
-
-            writer.WriteByte(Index);
-            writer.WriteDouble(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<double> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteDouble(property.Value);
         }
     }
-    
-    public class FloatPropertyBinarySerializer : PropertyBinarySerializer<float>
+
+    public sealed class UShortPropertyBinarySerializer : PropertyBinarySerializer<ushort, UShortWriter>
     {
-        public FloatPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public UShortPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, UShortWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadFloat());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<float> property = Getter.Get(obj);
-            if (Math.Abs(property.Value) < 1e-6) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteFloat(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<float> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteFloat(property.Value);
         }
     }
-    
-    public class LongPropertyBinarySerializer : PropertyBinarySerializer<long>
+
+    public sealed class IntPropertyBinarySerializer : PropertyBinarySerializer<int, IntWriter>
     {
-        public LongPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public IntPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, IntWriter writer) : base(index,
+            ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadLong());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<long> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteLong(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<long> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteLong(property.Value);
         }
     }
-    
-    public class SBytePropertyBinarySerializer : PropertyBinarySerializer<sbyte>
+
+    public sealed class UIntPropertyBinarySerializer : PropertyBinarySerializer<uint, UIntWriter>
     {
-        public SBytePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public UIntPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, UIntWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadSByte());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<sbyte> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteSByte(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<sbyte> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteSByte(property.Value);
         }
     }
-    
-    public class ShortPropertyBinarySerializer : PropertyBinarySerializer<short>
+
+    public sealed class LongPropertyBinarySerializer : PropertyBinarySerializer<long, LongWriter>
     {
-        public ShortPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public LongPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, LongWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadShort());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<short> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteShort(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<short> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteShort(property.Value);
         }
     }
-    
-    public class ShortFloatPropertyBinarySerializer : PropertyBinarySerializer<float>
+
+    public sealed class ULongPropertyBinarySerializer : PropertyBinarySerializer<ulong, ULongWriter>
     {
-        public ShortFloatPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public ULongPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, ULongWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadShortFloat());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<float> property = Getter.Get(obj);
-            if (Math.Abs(property.Value) < 1e-6) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteShortFloat(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<float> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteShortFloat(property.Value);
         }
     }
-    
-    public class StringPropertyBinarySerializer : PropertyBinarySerializer<string>
+
+    public sealed class DoublePropertyBinarySerializer : PropertyBinarySerializer<double, DoubleWriter>
     {
-        public StringPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public DoublePropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, DoubleWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadString());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<string> property = Getter.Get(obj);
-            if (string.IsNullOrEmpty(property.Value)) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteString(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<string> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteString(property.Value);
         }
     }
-    
-    public class UIntPropertyBinarySerializer : PropertyBinarySerializer<uint>
+
+    public sealed class CharPropertyBinarySerializer : PropertyBinarySerializer<char, CharWriter>
     {
-        public UIntPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public CharPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, CharWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadUInt());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<uint> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteUInt(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<uint> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteUInt(property.Value);
         }
     }
-    
-    public class ULongPropertyBinarySerializer : PropertyBinarySerializer<ulong>
+
+    public sealed class FloatPropertyBinarySerializer : PropertyBinarySerializer<float, FloatWriter>
     {
-        public ULongPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public FloatPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, FloatWriter writer) : base(
+            index, ownerType, field, writer)
         {
-        }
-
-        public override void Update(object obj, BinaryDataReader reader)
-        {
-            Getter.Get(obj).Update(reader.ReadULong());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<ulong> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteULong(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<ulong> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteULong(property.Value);
         }
     }
-    
-    public class UShortPropertyBinarySerializer : PropertyBinarySerializer<ushort>
+
+    public sealed class ShortFloatPropertyBinarySerializer : PropertyBinarySerializer<float, ShortFloatWriter>
     {
-        public UShortPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field) : base(index, ownerType, field)
+        public ShortFloatPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, ShortFloatWriter writer)
+            : base(index, ownerType, field, writer)
         {
         }
+    }
 
-        public override void Update(object obj, BinaryDataReader reader)
+    public sealed class StringPropertyBinarySerializer : PropertyBinarySerializer<string, StringWriter>
+    {
+        public StringPropertyBinarySerializer(byte index, Type ownerType, FieldInfo field, StringWriter writer) : base(
+            index, ownerType, field, writer)
         {
-            Getter.Get(obj).Update(reader.ReadUShort());
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer)
-        {
-            Property<ushort> property = Getter.Get(obj);
-            if (property.Value == default) 
-                return;
-            
-            writer.WriteByte(Index);
-            writer.WriteUShort(property.Value);
-        }
-
-        public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
-        {
-            Property<ushort> property = Getter.Get(obj);
-            if (baseline[Index] == property.Version)
-                return;
-            baseline[Index] = property.Version;
-            
-            writer.WriteByte(Index);
-            writer.WriteUShort(property.Value);
         }
     }
 }
