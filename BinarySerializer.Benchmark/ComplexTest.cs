@@ -1,8 +1,7 @@
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using BinarySerializer.Serializers;
+using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Benchmark
 {
@@ -10,101 +9,104 @@ namespace BinarySerializer.Benchmark
     [MemoryDiagnoser]
     public class ComplexTest
     {
-        private TestClass _testObj;    
-        private FieldFastCaller<byte> _fieldCaller;
+        private class CollectionsMock
+        {
+            [BinaryItem] public readonly ByteBinaryObjectCollection<ItemMock> ByteItems = new ByteBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly UShortBinaryObjectCollection<ItemMock> UShortItems = new UShortBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly ShortBinaryObjectCollection<ItemMock> ShortItems = new ShortBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly IntBinaryObjectCollection<ItemMock> IntItems = new IntBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly UIntBinaryObjectCollection<ItemMock> UIntItems = new UIntBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly LongBinaryObjectCollection<ItemMock> LongItems = new LongBinaryObjectCollection<ItemMock>();
+            [BinaryItem] public readonly ULongBinaryObjectCollection<ItemMock> ULongItems = new ULongBinaryObjectCollection<ItemMock>();
+        }
 
-        private enum Enum1 : byte
+        private class ItemMock
         {
-            First = 0,
-            Second = 1
+            [BinaryItem] public bool Bool;
+            [BinaryItem] public byte Byte;
+            [BinaryItem] public sbyte Sbyte;
+            [BinaryItem] public short Short;
+            [BinaryItem] public ushort UShort;
+            [BinaryItem] public int Int;
+            [BinaryItem] public uint UInt;
+            [BinaryItem] public long Long;
+            [BinaryItem] public ulong ULong;
+            [BinaryItem] public double Double;
+            [BinaryItem] public char Char;
+            [BinaryItem] public float Float;
+            [BinaryItem(true)] public float ShortFloat;
+            [BinaryItem] public string String;
         }
-        
-        private class TestClass
-        {
-            private Enum1 _enum = Enum1.First;
-            private int IntField = 10;
-        }
+
+        private CollectionsMock _source;
+        private byte[] _data;
+        private Baseline<byte> _baseline;
 
         [GlobalSetup]
         public void Setup()
         {
-            _testObj = new TestClass();
+            _source = new CollectionsMock();
 
-            FieldInfo fieldInfo = _testObj.GetType().GetField("_enum", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            _fieldCaller = new FieldFastCaller<byte>(_testObj.GetType(), fieldInfo);
+            for (int i = 0; i < byte.MaxValue; i++)
+            {
+                _source.ByteItems.Add((byte) i, InstantiateItem());
+                _source.UShortItems.Add((ushort) i, InstantiateItem());
+                _source.ShortItems.Add((short) i, InstantiateItem());
+                _source.IntItems.Add(i, InstantiateItem());
+                _source.UIntItems.Add((uint) i, InstantiateItem());
+                _source.LongItems.Add(i, InstantiateItem());
+                _source.ULongItems.Add((ulong) i, InstantiateItem());
+            }
 
-
+            _baseline = new Baseline<byte>();
+            _data = BinarySerializer.Serialize(_source, _baseline);
         }
 
-        [Params(1000000)] public int IterationsCount;
-        
+        private static ItemMock InstantiateItem()
+        {
+            return new ItemMock
+            {
+                Bool = true,
+                Byte = byte.MaxValue - 1,
+                Double = double.MaxValue - 1,
+                Int = int.MaxValue - 1,
+                Long = long.MaxValue - 1,
+                Sbyte = sbyte.MaxValue - 1,
+                Short = short.MaxValue - 1,
+                UInt = uint.MaxValue - 1,
+                ULong = ulong.MaxValue - 1,
+                UShort = ushort.MaxValue - 1,
+                Char = char.MaxValue,
+                Float = float.MaxValue - 1,
+                ShortFloat = 1.5f,
+                String = "DotNet"
+            };
+        }
 
-        
         [Benchmark]
-        public void GetFieldExpression()
+        public void SerializeTest()
         {
-            for (int i = 0; i < IterationsCount; i++)
-            {
-                byte value = _fieldCaller.Get(_testObj);
-            }            
+            byte[] data = BinarySerializer.Serialize(_source);
         }
 
         [Benchmark]
-        public void SetFieldExpression()
+        public void SerializeEmptyBaselineTest()
         {
-            for (int i = 0; i < IterationsCount; i++)
-            {
-                _fieldCaller.Set(_testObj, 1);
-            }            
+            Baseline<byte> baseline = new Baseline<byte>();
+            byte[] data = BinarySerializer.Serialize(_source, baseline);
         }
 
-
-        private class FieldFastCaller<T>
+        [Benchmark]
+        public void SerializeFullBaselineTest()
         {
-            private readonly Func<object, T> _getter;
-            private readonly Action<object, T> _setter;
-            
-            public FieldFastCaller(Type type, FieldInfo info)
-            {
-                ParameterExpression instance = Expression.Parameter(typeof(object), "obj");
-                ParameterExpression argument = Expression.Parameter(typeof(T), "arg");
-                UnaryExpression newInstance = Expression.Convert(instance, type);
-                MemberExpression exp = Expression.Field(newInstance, info);
-                BinaryExpression assignExp = Expression.Assign(exp, argument);
-                _getter = (Func<object, T>) Expression.Lambda(exp, instance).Compile();
-                _setter = Expression.Lambda<Action<object, T>>(assignExp, instance, argument).Compile();
-            }
-
-            public T Get(object owner)
-            {
-                return _getter(owner);
-            }
-
-            public void Set(object owner, T value)
-            {
-                _setter(owner, value);
-            }
+            byte[] data = BinarySerializer.Serialize(_source, _baseline);
         }
 
-
-
-        private static Func<object, int> IntGetter(Type type, PropertyInfo info)
+        [Benchmark]
+        public void DeserializeTest()
         {
-            ParameterExpression instance = Expression.Parameter(typeof(object), "obj");
-            UnaryExpression newInstance = Expression.Convert(instance, type);
-            MemberExpression exp = Expression.Property(newInstance, info);
-            return (Func<object, int>) Expression.Lambda(exp, instance).Compile();
+            CollectionsMock target = new CollectionsMock();
+            BinarySerializer.Deserialize(target, _data);
         }
-        
-        private static Action<object, int> IntSetter(Type type, PropertyInfo info)
-        {
-            ParameterExpression instance = Expression.Parameter(typeof(object), "obj");
-            ParameterExpression argument = Expression.Parameter(typeof(int), "arg");
-            UnaryExpression newInstance = Expression.Convert(instance, type);
-            MemberExpression exp = Expression.Property(newInstance, info);
-            BinaryExpression assignExp = Expression.Assign(exp, argument);
-            return Expression.Lambda<Action<object, int>>(assignExp, instance, argument).Compile();
-        }
-
     }
 }

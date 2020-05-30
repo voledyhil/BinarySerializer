@@ -176,25 +176,25 @@ namespace BinarySerializer
 
                         if (typeof(IBinaryObjectCollection<byte>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field,
-                                new DictionaryByteKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryByteKeyBinarySerializer(itemCreator, valueSer, ByteWriter)));
                         else if (typeof(IBinaryObjectCollection<short>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<short>(index, ownerType, field,
-                                new DictionaryShortKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryShortKeyBinarySerializer(itemCreator, valueSer, ShortWriter)));
                         else if (typeof(IBinaryObjectCollection<ushort>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<ushort>(index, ownerType, field,
-                                new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer, UShortWriter)));
                         else if (typeof(IBinaryObjectCollection<int>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<int>(index, ownerType, field,
-                                new DictionaryIntKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryIntKeyBinarySerializer(itemCreator, valueSer, IntWriter)));
                         else if (typeof(IBinaryObjectCollection<uint>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<uint>(index, ownerType, field,
-                                new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer, UIntWriter)));
                         else if (typeof(IBinaryObjectCollection<long>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<long>(index, ownerType, field,
-                                new DictionaryLongKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryLongKeyBinarySerializer(itemCreator, valueSer, LongWriter)));
                         else if (typeof(IBinaryObjectCollection<ulong>).IsAssignableFrom(fieldType))
                             serializers.Add(new ByteWrapperBinarySerializer<ulong>(index, ownerType, field,
-                                new DictionaryULongKeyBinarySerializer(itemCreator, valueSer)));
+                                new DictionaryULongKeyBinarySerializer(itemCreator, valueSer, UlongWriter)));
                         else throw new ArgumentException();
                     }
                     else

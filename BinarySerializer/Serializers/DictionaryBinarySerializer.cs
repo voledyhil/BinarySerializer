@@ -123,24 +123,23 @@ namespace BinarySerializer.Serializers
         }
     }
     
-    public abstract class DictionaryBinarySerializer<TKey> : IBinarySerializer<TKey> where TKey : unmanaged
+    public abstract class DictionaryBinarySerializer<TKey, TWriter> : IBinarySerializer<TKey> where TKey : unmanaged where TWriter : IPrimitiveWriter<TKey>
     {
         private readonly int _keySize;
         private readonly TKey _reservedKey;
         private readonly Creator _itemCreator;
         private readonly CompositeBinarySerializer _itemSerializer;
+        private readonly TWriter _writer;
 
         protected DictionaryBinarySerializer(int keySize, TKey reservedKey, Creator itemCreator,
-            CompositeBinarySerializer itemSerializer)
+            CompositeBinarySerializer itemSerializer, TWriter writer)
         {
             _keySize = keySize;
             _reservedKey = reservedKey;
             _itemCreator = itemCreator;
             _itemSerializer = itemSerializer;
+            _writer = writer;
         }
-
-        protected abstract TKey ReadKey(BinaryDataReader reader);
-        protected abstract void WriteKey(TKey key, BinaryDataWriter writer);
 
         public void Update(object obj, BinaryDataReader reader)
         {
@@ -148,7 +147,7 @@ namespace BinarySerializer.Serializers
 
             while (reader.Position < reader.Length)
             {
-                TKey key = ReadKey(reader);
+                TKey key = _writer.Read(reader);
                 if (_reservedKey.Equals(key))
                     break;
 
@@ -165,7 +164,7 @@ namespace BinarySerializer.Serializers
 
             while (reader.Position < reader.Length)
             {
-                collection.Remove(ReadKey(reader));
+                collection.Remove(_writer.Read(reader));
             }
         }
 
@@ -180,7 +179,7 @@ namespace BinarySerializer.Serializers
                 
                 BinaryDataWriter itemWriter = writer.TryWriteNode(_keySize);
                 _itemSerializer.Serialize(collection[key], itemWriter);
-                WriteKey(key, writer);
+                _writer.Write(writer, key);
                 itemWriter.PushNode();
             }
         }
@@ -198,13 +197,12 @@ namespace BinarySerializer.Serializers
             foreach (TKey key in collections.Keys)
             {
                 BinaryDataWriter itemWriter = writer.TryWriteNode(_keySize);
-                Baseline<byte> itemBaseline =
-                    baseline.GetOrCreateBaseline<Baseline<byte>>(key, _itemSerializer.Count, out bool isNew);
+                Baseline<byte> itemBaseline = baseline.GetOrCreateBaseline<Baseline<byte>>(key, _itemSerializer.Count, out bool isNew);
                 
                 _itemSerializer.Serialize(collections[key], itemWriter, itemBaseline);
                 if (itemWriter.Length > 0 || isNew)
                 {
-                    WriteKey(key, writer);
+                    _writer.Write(writer, key);
                     itemWriter.PushNode();
                 }
                 
@@ -214,139 +212,69 @@ namespace BinarySerializer.Serializers
             if (baseKeys.Count <= 0)
                 return;
 
-            WriteKey(_reservedKey, writer);
+            _writer.Write(writer, _reservedKey);
            
             foreach (TKey key in baseKeys)
             {
-                WriteKey(key, writer);
+                _writer.Write(writer, key);
                 baseline.DestroyBaseline(key);
             }
         }
     }
     
-    public class DictionaryByteKeyBinarySerializer : DictionaryBinarySerializer<byte>
+    public class DictionaryByteKeyBinarySerializer : DictionaryBinarySerializer<byte, ByteWriter>
     {
-        public DictionaryByteKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(byte), byte.MaxValue, itemCreator, itemSerializer)
+        public DictionaryByteKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, ByteWriter writer) : base(
+            sizeof(byte), byte.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override byte ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadByte();
-        }
-
-        protected override void WriteKey(byte key, BinaryDataWriter writer)
-        {
-            writer.WriteByte(key);
         }
     }
 
-    public class DictionaryShortKeyBinarySerializer : DictionaryBinarySerializer<short>
+    public class DictionaryShortKeyBinarySerializer : DictionaryBinarySerializer<short, ShortWriter>
     {
-        public DictionaryShortKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(ushort), short.MaxValue, itemCreator, itemSerializer)
+        public DictionaryShortKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, ShortWriter writer) : base(
+            sizeof(ushort), short.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override short ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadShort();
-        }
-
-        protected override void WriteKey(short key, BinaryDataWriter writer)
-        {
-            writer.WriteShort(key);
         }
     }
     
-    public class DictionaryUShortKeyBinarySerializer : DictionaryBinarySerializer<ushort>
+    public class DictionaryUShortKeyBinarySerializer : DictionaryBinarySerializer<ushort, UShortWriter>
     {
-        public DictionaryUShortKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(ushort), ushort.MaxValue, itemCreator, itemSerializer)
+        public DictionaryUShortKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, UShortWriter writer) : base(
+            sizeof(ushort), ushort.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override ushort ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadUShort();
-        }
-
-        protected override void WriteKey(ushort key, BinaryDataWriter writer)
-        {
-            writer.WriteUShort(key);
         }
     }
     
-    public class DictionaryIntKeyBinarySerializer : DictionaryBinarySerializer<int>
+    public class DictionaryIntKeyBinarySerializer : DictionaryBinarySerializer<int, IntWriter>
     {
-        public DictionaryIntKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(int), int.MaxValue, itemCreator, itemSerializer)
+        public DictionaryIntKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, IntWriter writer) : base(
+            sizeof(int), int.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override int ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadInt();
-        }
-
-        protected override void WriteKey(int key, BinaryDataWriter writer)
-        {
-            writer.WriteInt(key);
         }
     }
     
-    public class DictionaryUIntKeyBinarySerializer : DictionaryBinarySerializer<uint>
+    public class DictionaryUIntKeyBinarySerializer : DictionaryBinarySerializer<uint, UIntWriter>
     {
-        public DictionaryUIntKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(int), uint.MaxValue, itemCreator, itemSerializer)
+        public DictionaryUIntKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, UIntWriter writer) : base(
+            sizeof(int), uint.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override uint ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadUInt();
-        }
-
-        protected override void WriteKey(uint key, BinaryDataWriter writer)
-        {
-            writer.WriteUInt(key);
         }
     }
     
-    public class DictionaryLongKeyBinarySerializer : DictionaryBinarySerializer<long>
+    public class DictionaryLongKeyBinarySerializer : DictionaryBinarySerializer<long, LongWriter>
     {
-        public DictionaryLongKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(long), long.MaxValue, itemCreator, itemSerializer)
+        public DictionaryLongKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, LongWriter writer) : base(
+            sizeof(long), long.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override long ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadLong();
-        }
-
-        protected override void WriteKey(long key, BinaryDataWriter writer)
-        {
-            writer.WriteLong(key);
         }
     }
     
-    public class DictionaryULongKeyBinarySerializer : DictionaryBinarySerializer<ulong>
+    public class DictionaryULongKeyBinarySerializer : DictionaryBinarySerializer<ulong, ULongWriter>
     {
-        public DictionaryULongKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer) : base(
-            sizeof(long), long.MaxValue, itemCreator, itemSerializer)
+        public DictionaryULongKeyBinarySerializer(Creator itemCreator, CompositeBinarySerializer itemSerializer, ULongWriter writer) : base(
+            sizeof(long), long.MaxValue, itemCreator, itemSerializer, writer)
         {
-        }
-
-        protected override ulong ReadKey(BinaryDataReader reader)
-        {
-            return reader.ReadULong();
-        }
-
-        protected override void WriteKey(ulong key, BinaryDataWriter writer)
-        {
-            writer.WriteULong(key);
         }
     }
 }

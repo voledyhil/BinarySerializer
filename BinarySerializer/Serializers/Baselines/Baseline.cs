@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BinarySerializer.Serializers.Baselines
 {
-    public interface IBaseline : ICloneable, IDisposable
+    public interface IBaseline : ICloneable
     {
         new IBaseline Clone();
         bool HasValues { get; }
@@ -103,17 +103,6 @@ namespace BinarySerializer.Serializers.Baselines
         public IBaseline Clone()
         {
             return new Baseline<TKey>(_baselines, _values);
-        }
-
-        public void Dispose()
-        {
-            if (_baselines != null)
-            {
-                _baselines.Clear();
-                _baselines = null;
-            }
-
-            _values = null;
-        }
+        } 
     }
 }
