@@ -67,6 +67,9 @@ namespace BinarySerializer
 
         public static CompositeBinarySerializer RegisterType(Type ownerType)
         {
+            if (Serializers.TryGetValue(ownerType, out CompositeBinarySerializer item))
+                return item;
+            
             FieldInfo[] fields =
                 ownerType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             List<IBinarySerializer> serializers = new List<IBinarySerializer>(fields.Length);
