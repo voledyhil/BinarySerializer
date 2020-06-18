@@ -10,15 +10,15 @@ namespace BinarySerializer.Serializers
     {
         protected readonly byte Index;
         protected readonly FieldInfo Field;
-        protected readonly Getter<object> Getter;
-        protected readonly Setter<object> Setter;
+        protected readonly Func<object, object> Getter;
+        protected readonly Action<object, object> Setter;
 
         protected EnumBinarySerializer(byte index, Type ownerType, FieldInfo field)
         {
             Index = index;
             Field = field;
-            Getter = new Getter<object>(ownerType, field);
-            Setter = new Setter<object>(ownerType, field);
+            Getter = Expression.InstantiateGetter<object>(ownerType, field);
+            Setter = Expression.InstantiateSetter<object>(ownerType, field);
         }
         
         void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
@@ -40,12 +40,12 @@ namespace BinarySerializer.Serializers
 
         public override void Update(object obj, BinaryDataReader reader)
         {
-            Setter.Set(obj, Enum.ToObject(Field.FieldType, reader.ReadByte()));
+            Setter(obj, Enum.ToObject(Field.FieldType, reader.ReadByte()));
         }
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
-            byte value = (byte) Getter.Get(obj);
+            byte value = (byte) Getter(obj);
             if (value == default)
                 return;
 
@@ -55,7 +55,7 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
-            byte value = (byte) Getter.Get(obj);
+            byte value = (byte) Getter(obj);
 
             int baseHash = baseline[Index];
             if (baseHash == 0 && value == default || baseHash == value)
@@ -76,12 +76,12 @@ namespace BinarySerializer.Serializers
 
         public override void Update(object obj, BinaryDataReader reader)
         {
-            Setter.Set(obj, Enum.ToObject(Field.FieldType, reader.ReadInt()));
+            Setter(obj, Enum.ToObject(Field.FieldType, reader.ReadInt()));
         }
 
         public override void Serialize(object obj, BinaryDataWriter writer)
         {
-            int value = (int)Getter.Get(obj);
+            int value = (int)Getter(obj);
             if (value == default)
                 return;
             
@@ -91,7 +91,7 @@ namespace BinarySerializer.Serializers
 
         public override void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
         {
-            int value = (int) Getter.Get(obj);
+            int value = (int) Getter(obj);
             int baseHash = baseline[Index];
             if (baseHash == 0 && value == default || baseHash == value)
                 return;
