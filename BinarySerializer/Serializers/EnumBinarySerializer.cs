@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using BinarySerializer.Data;
-using BinarySerializer.Expressions;
 using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
@@ -17,8 +16,8 @@ namespace BinarySerializer.Serializers
         {
             Index = index;
             Field = field;
-            Getter = Expression.InstantiateGetter<object>(ownerType, field);
-            Setter = Expression.InstantiateSetter<object>(ownerType, field);
+            Getter = Expressions.Expressions.InstantiateGetter<object>(ownerType, field);
+            Setter = Expressions.Expressions.InstantiateSetter<object>(ownerType, field);
         }
         
         void IBinarySerializer.Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)

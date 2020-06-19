@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using BinarySerializer.Data;
-using BinarySerializer.Expressions;
 using BinarySerializer.Serializers.Baselines;
 
 namespace BinarySerializer.Serializers
@@ -19,7 +18,7 @@ namespace BinarySerializer.Serializers
             _index = index;
             _serializer = serializer;
             _valuesCount = valuesCount;
-            _getter = Expression.InstantiateGetter<object>(ownerType, field);
+            _getter = Expressions.Expressions.InstantiateGetter<object>(ownerType, field);
         }
 
         protected abstract void WriteKey(TKey index, BinaryDataWriter writer);

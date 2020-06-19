@@ -173,7 +173,7 @@ namespace BinarySerializer
 
                         if (!Creators.TryGetValue(valueType, out ObjectActivator itemCreator))
                         {
-                            itemCreator = Expression.InstantiateCreator(valueType.GetConstructor(new Type[] { }));
+                            itemCreator = Expressions.Expressions.InstantiateCreator(valueType.GetConstructor(new Type[] { }));
                             Creators.Add(valueType, itemCreator);
                         }
 
