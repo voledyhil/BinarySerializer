@@ -22,7 +22,7 @@ namespace BinarySerializer.Data
                 _data = new byte[AllocSize];
             
             if (newLen > _data.Length)
-                Array.Resize(ref _data, AllocSize + newLen);
+                Array.Resize(ref _data, Math.Max(2 * _data.Length, newLen));
         }
 
         public void CopyFrom(byte[] src, int srcOffset, int dstOffset, int count)
