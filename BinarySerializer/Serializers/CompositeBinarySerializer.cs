@@ -9,6 +9,7 @@ namespace BinarySerializer.Serializers
         public int Count => _items.Count;
         private readonly Dictionary<byte, IBinarySerializer> _items;
 
+        
         public CompositeBinarySerializer(Dictionary<byte, IBinarySerializer> items)
         {
             _items = items;
