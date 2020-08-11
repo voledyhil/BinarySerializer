@@ -7,9 +7,9 @@ namespace BinarySerializer.Serializers
     public class CompositeBinarySerializer : IBinarySerializer
     {
         public int Count => _items.Count;
-        private readonly List<IBinarySerializer> _items;
+        private readonly Dictionary<byte, IBinarySerializer> _items;
 
-        public CompositeBinarySerializer(List<IBinarySerializer> items)
+        public CompositeBinarySerializer(Dictionary<byte, IBinarySerializer> items)
         {
             _items = items;
         }
@@ -18,23 +18,25 @@ namespace BinarySerializer.Serializers
         {
             while (reader.Position < reader.Length)
             {
-                _items[reader.ReadByte()].Update(obj, reader);
+                byte id = reader.ReadByte();
+                if (_items.TryGetValue(id, out IBinarySerializer serializer))
+                    serializer.Update(obj, reader);
             }
         }
 
         public void Serialize(object obj, BinaryDataWriter writer)
         {
-            for (int i = 0; i < _items.Count && i < byte.MaxValue; i++)
+            foreach (IBinarySerializer item in _items.Values)
             {
-                _items[i].Serialize(obj, writer);
+                item.Serialize(obj, writer);
             }
         }
 
         public void Serialize(object obj, BinaryDataWriter writer, IBaseline baseline)
         {
-            for (int i = 0; i < _items.Count && i < byte.MaxValue; i++)
+            foreach (IBinarySerializer item in _items.Values)
             {
-                _items[i].Serialize(obj, writer, baseline);
+                item.Serialize(obj, writer, baseline);
             }
         }
     }

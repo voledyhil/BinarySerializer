@@ -343,12 +343,12 @@ namespace BinarySerializer.Tests
             BinarySerializer.Deserialize(target, data);
             
             Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<byte>>(0, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<ushort>>(1, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<short>>(2, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<int>>(3, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<uint>>(4, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<long>>(5, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<ulong>>(6, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<ushort>>(10, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<short>>(20, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<int>>(30, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<uint>>(40, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<long>>(50, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(3, baseline.GetOrCreateBaseline<Baseline<ulong>>(60, 0, out _).BaselineKeys.ToArray().Length);
 
             
             Assert.AreEqual(3, target.ByteObjects.Count);
@@ -400,12 +400,12 @@ namespace BinarySerializer.Tests
             BinarySerializer.Deserialize(target, data);
             
             Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<byte>>(0, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<ushort>>(1, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<short>>(2, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<int>>(3, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<uint>>(4, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<long>>(5, 0, out _).BaselineKeys.ToArray().Length);
-            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<ulong>>(6, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<ushort>>(10, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<short>>(20, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<int>>(30, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<uint>>(40, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<long>>(50, 0, out _).BaselineKeys.ToArray().Length);
+            Assert.AreEqual(2, baseline.GetOrCreateBaseline<Baseline<ulong>>(60, 0, out _).BaselineKeys.ToArray().Length);
             
             
             Assert.AreEqual(2, target.ByteObjects.Count);

@@ -11,31 +11,31 @@ namespace BinarySerializer.Benchmark
     {
         private class CollectionsMock
         {
-            [BinaryItem] public readonly ByteBinaryObjectCollection<ItemMock> ByteItems = new ByteBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly UShortBinaryObjectCollection<ItemMock> UShortItems = new UShortBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly ShortBinaryObjectCollection<ItemMock> ShortItems = new ShortBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly IntBinaryObjectCollection<ItemMock> IntItems = new IntBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly UIntBinaryObjectCollection<ItemMock> UIntItems = new UIntBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly LongBinaryObjectCollection<ItemMock> LongItems = new LongBinaryObjectCollection<ItemMock>();
-            [BinaryItem] public readonly ULongBinaryObjectCollection<ItemMock> ULongItems = new ULongBinaryObjectCollection<ItemMock>();
+            [BinaryItem(0)] public readonly ByteBinaryObjectCollection<ItemMock> ByteItems = new ByteBinaryObjectCollection<ItemMock>();
+            [BinaryItem(1)] public readonly UShortBinaryObjectCollection<ItemMock> UShortItems = new UShortBinaryObjectCollection<ItemMock>();
+            [BinaryItem(2)] public readonly ShortBinaryObjectCollection<ItemMock> ShortItems = new ShortBinaryObjectCollection<ItemMock>();
+            [BinaryItem(3)] public readonly IntBinaryObjectCollection<ItemMock> IntItems = new IntBinaryObjectCollection<ItemMock>();
+            [BinaryItem(4)] public readonly UIntBinaryObjectCollection<ItemMock> UIntItems = new UIntBinaryObjectCollection<ItemMock>();
+            [BinaryItem(5)] public readonly LongBinaryObjectCollection<ItemMock> LongItems = new LongBinaryObjectCollection<ItemMock>();
+            [BinaryItem(6)] public readonly ULongBinaryObjectCollection<ItemMock> ULongItems = new ULongBinaryObjectCollection<ItemMock>();
         }
 
         private class ItemMock
         {
-            [BinaryItem] public bool Bool;
-            [BinaryItem] public byte Byte;
-            [BinaryItem] public sbyte Sbyte;
-            [BinaryItem] public short Short;
-            [BinaryItem] public ushort UShort;
-            [BinaryItem] public int Int;
-            [BinaryItem] public uint UInt;
-            [BinaryItem] public long Long;
-            [BinaryItem] public ulong ULong;
-            [BinaryItem] public double Double;
-            [BinaryItem] public char Char;
-            [BinaryItem] public float Float;
-            [BinaryItem(true)] public float ShortFloat;
-            [BinaryItem] public string String;
+            [BinaryItem(0)] public bool Bool;
+            [BinaryItem(1)] public byte Byte;
+            [BinaryItem(2)] public sbyte Sbyte;
+            [BinaryItem(3)] public short Short;
+            [BinaryItem(4)] public ushort UShort;
+            [BinaryItem(5)] public int Int;
+            [BinaryItem(6)] public uint UInt;
+            [BinaryItem(7)] public long Long;
+            [BinaryItem(8)] public ulong ULong;
+            [BinaryItem(9)] public double Double;
+            [BinaryItem(10)] public char Char;
+            [BinaryItem(11)] public float Float;
+            [BinaryItem(12, true)] public float ShortFloat;
+            [BinaryItem(13)] public string String;
         }
 
         private CollectionsMock _source;

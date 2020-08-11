@@ -35,32 +35,29 @@ namespace BinarySerializer.Serializers.Baselines
 
         public int this[byte key]
         {
-            get => _values[key];
+            get => _values.TryGetValue(key, out int value) ? value : 0;
             set => _values[key] = value;
         }
 
         private Dictionary<TKey, IBaseline> _baselines;
-        private int[] _values;
+        private IDictionary<byte, int> _values;
 
         public Baseline()
         {
         }
 
-        private Baseline(IDictionary<TKey, IBaseline> baselines, int[] values)
+        private Baseline(IDictionary<TKey, IBaseline> baselines, IDictionary<byte, int> values)
         {
             if (values != null)
-            {
-                _values = new int[values.Length];
-                Array.Copy(values, _values, values.Length);
-            }
+                _values = new Dictionary<byte, int>(values);
 
-            if (baselines != null)
+            if (baselines == null) 
+                return;
+            
+            _baselines = new Dictionary<TKey, IBaseline>();
+            foreach (KeyValuePair<TKey, IBaseline> item in baselines)
             {
-                _baselines = new Dictionary<TKey, IBaseline>();
-                foreach (KeyValuePair<TKey, IBaseline> item in baselines)
-                {
-                    _baselines.Add(item.Key, item.Value.Clone());
-                }
+                _baselines.Add(item.Key, item.Value.Clone());
             }
         }
 
@@ -97,7 +94,7 @@ namespace BinarySerializer.Serializers.Baselines
                 throw new InvalidOperationException();
 
             if (size > 0)
-                _values = new int[size];
+                _values = new Dictionary<byte, int>(size);
         }
 
         public IBaseline Clone()

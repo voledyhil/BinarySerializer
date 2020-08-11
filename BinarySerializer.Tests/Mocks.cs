@@ -6,7 +6,7 @@ namespace BinarySerializer.Tests
 {   
     public class ParentMock : IEquatable<ParentMock>
     {
-        [BinaryItem] public ChildMock ChildMock = new ChildMock();
+        [BinaryItem(0)] public ChildMock ChildMock = new ChildMock();
 
         public bool Equals(ParentMock other)
         {
@@ -29,8 +29,8 @@ namespace BinarySerializer.Tests
     
     public class ChildMock : IEquatable<ChildMock>
     {
-        [BinaryItem] public bool Bool;
-        [BinaryItem] public int Int;
+        [BinaryItem(3)] public bool Bool;
+        [BinaryItem(1)] public int Int;
 
         public bool Equals(ChildMock other)
         {
@@ -57,20 +57,20 @@ namespace BinarySerializer.Tests
 
     public class PrimitivesMock : IEquatable<PrimitivesMock>
     {
-        [BinaryItem] public bool Bool;
-        [BinaryItem] public byte Byte;
-        [BinaryItem] public sbyte Sbyte;
-        [BinaryItem] public short Short;
-        [BinaryItem] public ushort UShort;
-        [BinaryItem] public int Int;
-        [BinaryItem] public uint UInt;
-        [BinaryItem] public long Long;
-        [BinaryItem] public ulong ULong;
-        [BinaryItem] public double Double;
-        [BinaryItem] public char Char;
-        [BinaryItem] public float Float;
-        [BinaryItem(true)] public float ShortFloat;
-        [BinaryItem] public string String;
+        [BinaryItem(0)] public bool Bool;
+        [BinaryItem(10)] public byte Byte;
+        [BinaryItem(20)] public sbyte Sbyte;
+        [BinaryItem(30)] public short Short;
+        [BinaryItem(40)] public ushort UShort;
+        [BinaryItem(50)] public int Int;
+        [BinaryItem(60)] public uint UInt;
+        [BinaryItem(70)] public long Long;
+        [BinaryItem(80)] public ulong ULong;
+        [BinaryItem(90)] public double Double;
+        [BinaryItem(100)] public char Char;
+        [BinaryItem(110)] public float Float;
+        [BinaryItem(120, true)] public float ShortFloat;
+        [BinaryItem(130)] public string String;
 
         public bool Equals(PrimitivesMock other)
         {
@@ -128,8 +128,8 @@ namespace BinarySerializer.Tests
     
     public class EnumsMock : IEquatable<EnumsMock>
     {
-        [BinaryItem] public ByteEnum ByteEnum;
-        [BinaryItem] public IntEnum IntEnum;
+        [BinaryItem(0)] public ByteEnum ByteEnum;
+        [BinaryItem(1)] public IntEnum IntEnum;
 
         public bool Equals(EnumsMock other)
         {
@@ -156,20 +156,20 @@ namespace BinarySerializer.Tests
 
     public class PropertiesMock : IEquatable<PropertiesMock>
     {
-        [BinaryItem] public Property<bool> BoolProperty = new Property<bool>();
-        [BinaryItem] public Property<byte> ByteProperty = new Property<byte>();
-        [BinaryItem] public Property<sbyte> SbyteProperty = new Property<sbyte>();
-        [BinaryItem] public Property<short> ShortProperty = new Property<short>();
-        [BinaryItem] public Property<ushort> UShortProperty = new Property<ushort>();
-        [BinaryItem] public Property<int> IntProperty = new Property<int>();
-        [BinaryItem] public Property<uint> UIntProperty = new Property<uint>();
-        [BinaryItem] public Property<long> LongProperty = new Property<long>();
-        [BinaryItem] public Property<ulong> ULongProperty = new Property<ulong>();
-        [BinaryItem] public Property<double> DoubleProperty = new Property<double>();
-        [BinaryItem] public Property<char> CharProperty = new Property<char>();
-        [BinaryItem] public Property<float> FloatProperty = new Property<float>();
-        [BinaryItem(true)] public Property<float> ShortFloatProperty = new Property<float>();
-        [BinaryItem] public Property<string> StringProperty = new Property<string>();
+        [BinaryItem(0)] public Property<bool> BoolProperty = new Property<bool>();
+        [BinaryItem(10)] public Property<byte> ByteProperty = new Property<byte>();
+        [BinaryItem(20)] public Property<sbyte> SbyteProperty = new Property<sbyte>();
+        [BinaryItem(30)] public Property<short> ShortProperty = new Property<short>();
+        [BinaryItem(40)] public Property<ushort> UShortProperty = new Property<ushort>();
+        [BinaryItem(50)] public Property<int> IntProperty = new Property<int>();
+        [BinaryItem(60)] public Property<uint> UIntProperty = new Property<uint>();
+        [BinaryItem(70)] public Property<long> LongProperty = new Property<long>();
+        [BinaryItem(80)] public Property<ulong> ULongProperty = new Property<ulong>();
+        [BinaryItem(90)] public Property<double> DoubleProperty = new Property<double>();
+        [BinaryItem(100)] public Property<char> CharProperty = new Property<char>();
+        [BinaryItem(110)] public Property<float> FloatProperty = new Property<float>();
+        [BinaryItem(120, true)] public Property<float> ShortFloatProperty = new Property<float>();
+        [BinaryItem(130)] public Property<string> StringProperty = new Property<string>();
 
         public bool Equals(PropertiesMock other)
         {
@@ -212,19 +212,19 @@ namespace BinarySerializer.Tests
 
     public class CollectionsMock
     {
-        [BinaryItem]
+        [BinaryItem(0)]
         public ByteBinaryObjectCollection<ChildMock> ByteObjects = new ByteBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(10)]
         public UShortBinaryObjectCollection<ChildMock> UShortObjects = new UShortBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(20)]
         public ShortBinaryObjectCollection<ChildMock> ShortObjects = new ShortBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(30)]
         public IntBinaryObjectCollection<ChildMock> IntObjects = new IntBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(40)]
         public UIntBinaryObjectCollection<ChildMock> UIntObjects = new UIntBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(50)]
         public LongBinaryObjectCollection<ChildMock> LongObjects = new LongBinaryObjectCollection<ChildMock>();
-        [BinaryItem]
+        [BinaryItem(60)]
         public ULongBinaryObjectCollection<ChildMock> ULongObjects = new ULongBinaryObjectCollection<ChildMock>();
     }
 }

@@ -70,12 +70,11 @@ namespace BinarySerializer
             if (Serializers.TryGetValue(ownerType, out CompositeBinarySerializer item))
                 return item;
             
-            FieldInfo[] fields =
-                ownerType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            List<IBinarySerializer> serializers = new List<IBinarySerializer>(fields.Length);
-            for (byte index = 0; index < fields.Length; index++)
+            FieldInfo[] fields = ownerType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            Dictionary<byte, IBinarySerializer> serializers = new Dictionary<byte, IBinarySerializer>(fields.Length);
+            for (byte i = 0; i < fields.Length; i++)
             {
-                FieldInfo field = fields[index];
+                FieldInfo field = fields[i];
                 BinaryItemAttribute attr =
                     (BinaryItemAttribute) field.GetCustomAttribute(typeof(BinaryItemAttribute), true);
                 if (attr == null)
@@ -86,85 +85,85 @@ namespace BinarySerializer
                 if (fieldType.IsPrimitive)
                 {
                     if (fieldType == typeof(bool))
-                        serializers.Add(new BoolBinarySerializer(index, ownerType, field, BoolWriter));
+                        serializers.Add(attr.Id, new BoolBinarySerializer(attr.Id, ownerType, field, BoolWriter));
                     else if (fieldType == typeof(byte))
-                        serializers.Add(new ByteBinarySerializer(index, ownerType, field, ByteWriter));
+                        serializers.Add(attr.Id, new ByteBinarySerializer(attr.Id, ownerType, field, ByteWriter));
                     else if (fieldType == typeof(sbyte))
-                        serializers.Add(new SByteBinarySerializer(index, ownerType, field, SbyteWriter));
+                        serializers.Add(attr.Id, new SByteBinarySerializer(attr.Id, ownerType, field, SbyteWriter));
                     else if (fieldType == typeof(short))
-                        serializers.Add(new ShortBinarySerializer(index, ownerType, field, ShortWriter));
+                        serializers.Add(attr.Id, new ShortBinarySerializer(attr.Id, ownerType, field, ShortWriter));
                     else if (fieldType == typeof(ushort))
-                        serializers.Add(new UShortBinarySerializer(index, ownerType, field, UShortWriter));
+                        serializers.Add(attr.Id, new UShortBinarySerializer(attr.Id, ownerType, field, UShortWriter));
                     else if (fieldType == typeof(int))
-                        serializers.Add(new IntBinarySerializer(index, ownerType, field, IntWriter));
+                        serializers.Add(attr.Id, new IntBinarySerializer(attr.Id, ownerType, field, IntWriter));
                     else if (fieldType == typeof(uint))
-                        serializers.Add(new UIntBinarySerializer(index, ownerType, field, UIntWriter));
+                        serializers.Add(attr.Id, new UIntBinarySerializer(attr.Id, ownerType, field, UIntWriter));
                     else if (fieldType == typeof(long))
-                        serializers.Add(new LongBinarySerializer(index, ownerType, field, LongWriter));
+                        serializers.Add(attr.Id, new LongBinarySerializer(attr.Id, ownerType, field, LongWriter));
                     else if (fieldType == typeof(ulong))
-                        serializers.Add(new ULongBinarySerializer(index, ownerType, field, UlongWriter));
+                        serializers.Add(attr.Id, new ULongBinarySerializer(attr.Id, ownerType, field, UlongWriter));
                     else if (fieldType == typeof(double))
-                        serializers.Add(new DoubleBinarySerializer(index, ownerType, field, DoubleWriter));
+                        serializers.Add(attr.Id, new DoubleBinarySerializer(attr.Id, ownerType, field, DoubleWriter));
                     else if (fieldType == typeof(char))
-                        serializers.Add(new CharBinarySerializer(index, ownerType, field, CharWriter));
+                        serializers.Add(attr.Id, new CharBinarySerializer(attr.Id, ownerType, field, CharWriter));
                     else if (fieldType == typeof(float))
-                        serializers.Add(attr.IsShort
-                            ? (IBinarySerializer) new ShortFloatBinarySerializer(index, ownerType, field,
+                        serializers.Add(attr.Id, attr.IsShort
+                            ? (IBinarySerializer) new ShortFloatBinarySerializer(attr.Id, ownerType, field,
                                 ShortFloatWriter)
-                            : new FloatBinarySerializer(index, ownerType, field, FloatWriter));
+                            : new FloatBinarySerializer(attr.Id, ownerType, field, FloatWriter));
                     else throw new ArgumentException();
                 }
                 else if (fieldType.IsEnum)
                 {
                     Type underlyingType = Enum.GetUnderlyingType(fieldType);
                     if (underlyingType == typeof(byte))
-                        serializers.Add(new ByteEnumBinarySerializer(index, ownerType, field));
+                        serializers.Add(attr.Id, new ByteEnumBinarySerializer(attr.Id, ownerType, field));
                     else if (underlyingType == typeof(int))
-                        serializers.Add(new IntEnumBinarySerializer(index, ownerType, field));
+                        serializers.Add(attr.Id, new IntEnumBinarySerializer(attr.Id, ownerType, field));
                     else throw new ArgumentException("Not supported enum underlying type: " + underlyingType.Name);
                 }
                 else if (fieldType == typeof(string))
                 {
-                    serializers.Add(new StringBinarySerializer(index, ownerType, field, StringWriter));
+                    serializers.Add(attr.Id, new StringBinarySerializer(attr.Id, ownerType, field, StringWriter));
                 }
                 else if (typeof(IProperty).IsAssignableFrom(fieldType))
                 {
                     if (fieldType == typeof(Property<bool>))
-                        serializers.Add(new BoolPropertyBinarySerializer(index, ownerType, field, BoolWriter));
+                        serializers.Add(attr.Id, new BoolPropertyBinarySerializer(attr.Id, ownerType, field, BoolWriter));
                     else if (fieldType == typeof(Property<byte>))
-                        serializers.Add(new BytePropertyBinarySerializer(index, ownerType, field, ByteWriter));
+                        serializers.Add(attr.Id, new BytePropertyBinarySerializer(attr.Id, ownerType, field, ByteWriter));
                     else if (fieldType == typeof(Property<sbyte>))
-                        serializers.Add(new SBytePropertyBinarySerializer(index, ownerType, field, SbyteWriter));
+                        serializers.Add(attr.Id, new SBytePropertyBinarySerializer(attr.Id, ownerType, field, SbyteWriter));
                     else if (fieldType == typeof(Property<short>))
-                        serializers.Add(new ShortPropertyBinarySerializer(index, ownerType, field, ShortWriter));
+                        serializers.Add(attr.Id, new ShortPropertyBinarySerializer(attr.Id, ownerType, field, ShortWriter));
                     else if (fieldType == typeof(Property<ushort>))
-                        serializers.Add(new UShortPropertyBinarySerializer(index, ownerType, field, UShortWriter));
+                        serializers.Add(attr.Id, new UShortPropertyBinarySerializer(attr.Id, ownerType, field, UShortWriter));
                     else if (fieldType == typeof(Property<int>))
-                        serializers.Add(new IntPropertyBinarySerializer(index, ownerType, field, IntWriter));
+                        serializers.Add(attr.Id, new IntPropertyBinarySerializer(attr.Id, ownerType, field, IntWriter));
                     else if (fieldType == typeof(Property<uint>))
-                        serializers.Add(new UIntPropertyBinarySerializer(index, ownerType, field, UIntWriter));
+                        serializers.Add(attr.Id, new UIntPropertyBinarySerializer(attr.Id, ownerType, field, UIntWriter));
                     else if (fieldType == typeof(Property<long>))
-                        serializers.Add(new LongPropertyBinarySerializer(index, ownerType, field, LongWriter));
+                        serializers.Add(attr.Id, new LongPropertyBinarySerializer(attr.Id, ownerType, field, LongWriter));
                     else if (fieldType == typeof(Property<ulong>))
-                        serializers.Add(new ULongPropertyBinarySerializer(index, ownerType, field, UlongWriter));
+                        serializers.Add(attr.Id, new ULongPropertyBinarySerializer(attr.Id, ownerType, field, UlongWriter));
                     else if (fieldType == typeof(Property<double>))
-                        serializers.Add(new DoublePropertyBinarySerializer(index, ownerType, field, DoubleWriter));
+                        serializers.Add(attr.Id, new DoublePropertyBinarySerializer(attr.Id, ownerType, field, DoubleWriter));
                     else if (fieldType == typeof(Property<char>))
-                        serializers.Add(new CharPropertyBinarySerializer(index, ownerType, field, CharWriter));
+                        serializers.Add(attr.Id, new CharPropertyBinarySerializer(attr.Id, ownerType, field, CharWriter));
                     else if (fieldType == typeof(Property<string>))
-                        serializers.Add(new StringPropertyBinarySerializer(index, ownerType, field, StringWriter));
+                        serializers.Add(attr.Id, new StringPropertyBinarySerializer(attr.Id, ownerType, field, StringWriter));
                     else if (fieldType == typeof(Property<float>))
-                        serializers.Add(attr.IsShort
-                            ? (IBinarySerializer) new ShortFloatPropertyBinarySerializer(index, ownerType, field,
+                        serializers.Add(attr.Id, attr.IsShort
+                            ? (IBinarySerializer) new ShortFloatPropertyBinarySerializer(attr.Id, ownerType, field,
                                 ShortFloatWriter)
-                            : new FloatPropertyBinarySerializer(index, ownerType, field, FloatWriter));
+                            : new FloatPropertyBinarySerializer(attr.Id, ownerType, field, FloatWriter));
                     else throw new ArgumentException();
                 }
                 else if (fieldType.IsClass)
                 {
                     if (Serializers.TryGetValue(fieldType, out CompositeBinarySerializer ser))
                     {
-                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, ser, ser.Count));
+                        serializers.Add(attr.Id, new ByteWrapperBinarySerializer<byte>(attr.Id, ownerType, field, ser, ser.Count));
                     }
                     else if (typeof(IBinaryObjectCollection).IsAssignableFrom(fieldType))
                     {
@@ -178,32 +177,32 @@ namespace BinarySerializer
                         }
 
                         if (typeof(IBinaryObjectCollection<byte>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<byte>(attr.Id, ownerType, field,
                                 new DictionaryByteKeyBinarySerializer(itemCreator, valueSer, ByteWriter)));
                         else if (typeof(IBinaryObjectCollection<short>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<short>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<short>(attr.Id, ownerType, field,
                                 new DictionaryShortKeyBinarySerializer(itemCreator, valueSer, ShortWriter)));
                         else if (typeof(IBinaryObjectCollection<ushort>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<ushort>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<ushort>(attr.Id, ownerType, field,
                                 new DictionaryUShortKeyBinarySerializer(itemCreator, valueSer, UShortWriter)));
                         else if (typeof(IBinaryObjectCollection<int>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<int>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<int>(attr.Id, ownerType, field,
                                 new DictionaryIntKeyBinarySerializer(itemCreator, valueSer, IntWriter)));
                         else if (typeof(IBinaryObjectCollection<uint>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<uint>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<uint>(attr.Id, ownerType, field,
                                 new DictionaryUIntKeyBinarySerializer(itemCreator, valueSer, UIntWriter)));
                         else if (typeof(IBinaryObjectCollection<long>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<long>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<long>(attr.Id, ownerType, field,
                                 new DictionaryLongKeyBinarySerializer(itemCreator, valueSer, LongWriter)));
                         else if (typeof(IBinaryObjectCollection<ulong>).IsAssignableFrom(fieldType))
-                            serializers.Add(new ByteWrapperBinarySerializer<ulong>(index, ownerType, field,
+                            serializers.Add(attr.Id, new ByteWrapperBinarySerializer<ulong>(attr.Id, ownerType, field,
                                 new DictionaryULongKeyBinarySerializer(itemCreator, valueSer, UlongWriter)));
                         else throw new ArgumentException();
                     }
                     else
                     {
                         ser = RegisterType(fieldType);
-                        serializers.Add(new ByteWrapperBinarySerializer<byte>(index, ownerType, field, ser, ser.Count));
+                        serializers.Add(attr.Id, new ByteWrapperBinarySerializer<byte>(attr.Id, ownerType, field, ser, ser.Count));
                     }
                 }
                 else throw new ArgumentException();
