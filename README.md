@@ -11,10 +11,10 @@ public class Location
     public ByteBinaryObjectCollection<Character> Characters => _characters;
     public IntBinaryObjectCollection<Structure> Structures => _structures;
 
-    [BinaryItem]
+    [BinaryItem(0)]
     private readonly ByteBinaryObjectCollection<Character> _characters = new ByteBinaryObjectCollection<Character>();
 
-    [BinaryItem]
+    [BinaryItem(1)]
     private readonly IntBinaryObjectCollection<Structure> _structures = new IntBinaryObjectCollection<Structure>();
 }
 
@@ -38,9 +38,9 @@ public class Character
         set => _score = value;
     }
 
-    [BinaryItem] private string _name;
-    [BinaryItem] private byte _age;
-    [BinaryItem] private int _score;
+    [BinaryItem(0)] private string _name;
+    [BinaryItem(1)] private byte _age;
+    [BinaryItem(2)] private int _score;
 
     public bool Equals(Character obj)
     {
@@ -77,9 +77,9 @@ public class Structure
         _id = id;
     }
 
-    [BinaryItem] private uint _id;
-    [BinaryItem] private float _posX;
-    [BinaryItem] private float _posY;
+    [BinaryItem(0)] private uint _id;
+    [BinaryItem(1)] private float _posX;
+    [BinaryItem(2)] private float _posY;
 
     public bool Equals(Structure obj)
     {
@@ -112,7 +112,7 @@ source.Structures.Add(2, st2);
 ``` 
 ### Full serialization
 ```csharp
-byte[] data = BinarySerializer.Serialize(source);  // data length -> 113 byte
+byte[] data = BinarySerializer.Serialize(source);
 ``` 
 
 Create new world and deserialize
@@ -139,7 +139,7 @@ Baseline<byte> baseline = new Baseline<byte>();
 ``` 
 Serialialize with baseline
 ```csharp
-data = BinarySerializer.Serialize(source, baseline); // data length 113 byte, because baseline is empty
+data = BinarySerializer.Serialize(source, baseline);
 ```
 Change data
 
@@ -148,5 +148,5 @@ mike.Score++;
 ``` 
 Serialize relative to the baseline
 ```csharp
-data = BinarySerializer.Serialize(source, baseline); // data length -> 11 byte
+data = BinarySerializer.Serialize(source, baseline);
 ``` 
