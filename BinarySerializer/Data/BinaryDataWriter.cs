@@ -28,80 +28,80 @@ namespace BinarySerializer.Data
 
         public void WriteByte(byte value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 1);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.ByteSize);
             Buffer[InnerLen] = value;
-            IncLength(1);
+            IncLength(PrimitiveSize.ByteSize);
         }
         
 
         public void WriteShort(short value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 2);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.ShortSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(2);
+            IncLength(PrimitiveSize.ShortSize);
         }
 
         public void WriteSByte(sbyte value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 1);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.SByteSize);
             Buffer[InnerLen] = unchecked((byte) value);
-            IncLength(1);
+            IncLength(PrimitiveSize.SByteSize);
         }
 
         public void WriteChar(char value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 2);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.CharSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(2);
+            IncLength(PrimitiveSize.CharSize);
         }
         
         public void WriteUShort(ushort value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 2);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.UShortSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(2);
+            IncLength(PrimitiveSize.UShortSize);
         }
         
         public void WriteDouble(double value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 8);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.DoubleSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(8);
+            IncLength(PrimitiveSize.DoubleSize);
         }
 
         public void WriteInt(int value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 4);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.IntSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(4);
+            IncLength(PrimitiveSize.IntSize);
         }
 
         public void WriteUInt(uint value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 4);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.UIntSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(4);
+            IncLength(PrimitiveSize.UIntSize);
         }
 
         public void WriteFloat(float value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 4);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.FloatSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(4);
+            IncLength(PrimitiveSize.FloatSize);
         }
 
         public void WriteLong(long value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 8);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.LongSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(8);
+            IncLength(PrimitiveSize.LongSize);
         }
 
         public void WriteULong(ulong value)
         {
-            Buffer.EnsureBufferSize(InnerLen + 8);
+            Buffer.EnsureBufferSize(InnerLen + PrimitiveSize.ULongSize);
             FastBitConverter.Write(Buffer.Data, InnerLen, value);
-            IncLength(8);
+            IncLength(PrimitiveSize.ULongSize);
         }
 
         public void WriteShortFloat(float value)
@@ -113,15 +113,15 @@ namespace BinarySerializer.Data
         {
             if (string.IsNullOrEmpty(value))
             {
-                WriteByte(0);
+                WriteUShort(0);
                 return;
             }
 
-            if (value.Length > byte.MaxValue)
-                value = value.Substring(0, byte.MaxValue);
+            if (value.Length > ushort.MaxValue)
+                value = value.Substring(0, ushort.MaxValue);
 
             byte[] bytes = Encoding.UTF8.GetBytes(value);
-            WriteByte((byte) bytes.Length);
+            WriteUShort((ushort) bytes.Length);
             Buffer.EnsureBufferSize(InnerLen + bytes.Length);
             Write(bytes);
         }

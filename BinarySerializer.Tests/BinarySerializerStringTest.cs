@@ -12,7 +12,7 @@ namespace BinarySerializer.Tests
             PrimitivesMock source = new PrimitivesMock {String = "DotNet"};
             byte[] data = BinarySerializer.Serialize(source);
 
-            Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
+            Assert.AreEqual(9, data.Length); // index + len + data (1 + 2 + 6) 
 
             PrimitivesMock target = new PrimitivesMock();
             BinarySerializer.Deserialize(target, data);
@@ -27,7 +27,7 @@ namespace BinarySerializer.Tests
             Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
 
-            Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
+            Assert.AreEqual(9, data.Length); // index + len + data (1 + 2 + 6) 
 
             PrimitivesMock target = new PrimitivesMock();
             BinarySerializer.Deserialize(target, data);
@@ -41,7 +41,7 @@ namespace BinarySerializer.Tests
             data = BinarySerializer.Serialize(source, baseline);
             BinarySerializer.Deserialize(target, data);
             
-            Assert.AreEqual(2, data.Length);
+            Assert.AreEqual(3, data.Length); // empty or null string
             Assert.AreEqual(source, target);
         }
         
@@ -51,7 +51,7 @@ namespace BinarySerializer.Tests
             PropertiesMock source = new PropertiesMock {StringProperty = {Value = "DotNet"}};
             byte[] data = BinarySerializer.Serialize(source);
 
-            Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
+            Assert.AreEqual(9, data.Length); // index + len + data (1 + 2 + 6) 
 
             PropertiesMock target = new PropertiesMock();
             BinarySerializer.Deserialize(target, data);
@@ -67,7 +67,7 @@ namespace BinarySerializer.Tests
             Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
 
-            Assert.AreEqual(8, data.Length); // index + len + data (1 + 1 + 6) 
+            Assert.AreEqual(9, data.Length); // index + len + data (1 + 2 + 6) 
 
             PropertiesMock target = new PropertiesMock();
             BinarySerializer.Deserialize(target, data);
@@ -81,7 +81,7 @@ namespace BinarySerializer.Tests
             data = BinarySerializer.Serialize(source, baseline);
             BinarySerializer.Deserialize(target, data);
             
-            Assert.AreEqual(2, data.Length);
+            Assert.AreEqual(3, data.Length); // empty or null string
             Assert.AreEqual(source, target);
         }
     }

@@ -11,24 +11,24 @@ namespace BinarySerializer.Tests
         {
             PropertiesMock source = new PropertiesMock
             {
-                BoolProperty = {Value = true}, //1.  1 byte
-                ByteProperty = {Value = byte.MaxValue}, //2.  1 byte
-                DoubleProperty = {Value = double.MaxValue}, //3.  8 byte
-                IntProperty = {Value = int.MaxValue}, //4.  4 byte
-                LongProperty = {Value = long.MaxValue}, //5.  8 byte
-                SbyteProperty = {Value = sbyte.MaxValue}, //6.  1 byte
-                ShortProperty = {Value = short.MaxValue}, //7.  2 byte
-                UIntProperty = {Value = uint.MaxValue}, //8.  4 byte
-                ULongProperty = {Value = ulong.MaxValue}, //9.  8 byte
-                UShortProperty = {Value = ushort.MaxValue}, //10. 2 byte
-                CharProperty = {Value = char.MaxValue}, //11. 2 byte
-                FloatProperty = {Value = float.MaxValue}, //12. 4 byte
-                ShortFloatProperty = {Value = 1.5f} //13. 2 byte
+                BoolProperty = {Value = true},                 //1. 2 byte file len + 1 byte
+                ByteProperty = {Value = byte.MaxValue},        //2. 2 byte file len + 1 byte
+                DoubleProperty = {Value = double.MaxValue},    //3. 2 byte file len + 8 byte
+                IntProperty = {Value = int.MaxValue},          //4. 2 byte file len + 4 byte
+                LongProperty = {Value = long.MaxValue},        //5. 2 byte file len + 8 byte
+                SbyteProperty = {Value = sbyte.MaxValue},      //6. 2 byte file len + 1 byte
+                ShortProperty = {Value = short.MaxValue},      //7. 2 byte file len + 2 byte
+                UIntProperty = {Value = uint.MaxValue},        //8. 2 byte file len + 4 byte
+                ULongProperty = {Value = ulong.MaxValue},      //9. 2 byte file len + 8 byte
+                UShortProperty = {Value = ushort.MaxValue},   //10. 2 byte file len + 2 byte
+                CharProperty = {Value = char.MaxValue},       //11. 2 byte file len + 2 byte
+                FloatProperty = {Value = float.MaxValue},     //12. 2 byte file len + 4 byte
+                ShortFloatProperty = {Value = 1.5f}           //13. 2 byte file len + 2 byte
             };
 
             byte[] data = BinarySerializer.Serialize(source);
 
-            Assert.AreEqual(60, data.Length); // fields data + indices data (47 + 13) 
+            Assert.AreEqual(86, data.Length); // fields data + indices data (73 + 13) 
 
             PropertiesMock target = new PropertiesMock();
             BinarySerializer.Deserialize(target, data);
@@ -40,25 +40,25 @@ namespace BinarySerializer.Tests
         {
             PropertiesMock source = new PropertiesMock
             {
-                BoolProperty = {Value = true}, //1.  1 byte
-                ByteProperty = {Value = byte.MaxValue}, //2.  1 byte
-                DoubleProperty = {Value = double.MaxValue}, //3.  8 byte
-                IntProperty = {Value = int.MaxValue}, //4.  4 byte
-                LongProperty = {Value = long.MaxValue}, //5.  8 byte
-                SbyteProperty = {Value = sbyte.MaxValue}, //6.  1 byte
-                ShortProperty = {Value = short.MaxValue}, //7.  2 byte
-                UIntProperty = {Value = uint.MaxValue}, //8.  4 byte
-                ULongProperty = {Value = ulong.MaxValue}, //9.  8 byte
-                UShortProperty = {Value = ushort.MaxValue}, //10. 2 byte
-                CharProperty = {Value = char.MaxValue}, //11. 2 byte
-                FloatProperty = {Value = float.MaxValue}, //12. 4 byte
-                ShortFloatProperty = {Value = 1.5f} //13. 2 byte
+                BoolProperty = {Value = true},                 //1. 2 byte file len + 1 byte
+                ByteProperty = {Value = byte.MaxValue},        //2. 2 byte file len + 1 byte
+                DoubleProperty = {Value = double.MaxValue},    //3. 2 byte file len + 8 byte
+                IntProperty = {Value = int.MaxValue},          //4. 2 byte file len + 4 byte
+                LongProperty = {Value = long.MaxValue},        //5. 2 byte file len + 8 byte
+                SbyteProperty = {Value = sbyte.MaxValue},      //6. 2 byte file len + 1 byte
+                ShortProperty = {Value = short.MaxValue},      //7. 2 byte file len + 2 byte
+                UIntProperty = {Value = uint.MaxValue},        //8. 2 byte file len + 4 byte
+                ULongProperty = {Value = ulong.MaxValue},      //9. 2 byte file len + 8 byte
+                UShortProperty = {Value = ushort.MaxValue},   //10. 2 byte file len + 2 byte
+                CharProperty = {Value = char.MaxValue},       //11. 2 byte file len + 2 byte
+                FloatProperty = {Value = float.MaxValue},     //12. 2 byte file len + 4 byte
+                ShortFloatProperty = {Value = 1.5f}           //13. 2 byte file len + 2 byte
             };
 
             Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
 
-            Assert.AreEqual(60, data.Length); // fields data + indices data (47 + 13) 
+            Assert.AreEqual(86, data.Length); // fields data + indices data (73 + 13) 
 
             PropertiesMock target = new PropertiesMock();
             BinarySerializer.Deserialize(target, data);
@@ -85,7 +85,7 @@ namespace BinarySerializer.Tests
             source.ShortFloatProperty.Value = -1.5f;
 
             data = BinarySerializer.Serialize(source, baseline);
-            Assert.AreEqual(60, data.Length);
+            Assert.AreEqual(86, data.Length);
             BinarySerializer.Deserialize(target, data);
             Assert.AreEqual(source, target);
         }

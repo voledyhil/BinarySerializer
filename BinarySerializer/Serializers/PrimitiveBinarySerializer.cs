@@ -33,12 +33,15 @@ namespace BinarySerializer.Serializers
                 return;
 
             writer.WriteByte(_index);
-            _writer.Write(writer, value);
+            
+            _writer.WriteSize(writer);
+            _writer.WriteData(writer, value);
         }
 
         public void Update(object obj, BinaryDataReader reader)
         {
-            _setter(obj, _writer.Read(reader));
+            _writer.SkipSize(reader);
+            _setter(obj, _writer.ReadData(reader));
         }
 
         public void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
@@ -50,7 +53,9 @@ namespace BinarySerializer.Serializers
                 return;
             baseline[_index] = hash;
             writer.WriteByte(_index);
-            _writer.Write(writer, value);
+            
+            _writer.WriteSize(writer);
+            _writer.WriteData(writer, value);
         }
     }
 

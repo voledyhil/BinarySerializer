@@ -27,7 +27,8 @@ namespace BinarySerializer.Serializers
 
         public void Update(object obj, BinaryDataReader reader)
         {
-            _getter(obj).Update(_writer.Read(reader));
+            _writer.SkipSize(reader);
+            _getter(obj).Update(_writer.ReadData(reader));
         }
 
         public void Serialize(object obj, BinaryDataWriter writer)
@@ -37,7 +38,9 @@ namespace BinarySerializer.Serializers
                 return;
 
             writer.WriteByte(_index);
-            _writer.Write(writer, property.Value);
+            
+            _writer.WriteSize(writer);
+            _writer.WriteData(writer, property.Value);
         }
 
         public void Serialize(object obj, BinaryDataWriter writer, IBaseline<byte> baseline)
@@ -48,7 +51,9 @@ namespace BinarySerializer.Serializers
 
             baseline[_index] = property.Version;
             writer.WriteByte(_index);
-            _writer.Write(writer, property.Value);
+            
+            _writer.WriteSize(writer);
+            _writer.WriteData(writer, property.Value);
         }
     }
 

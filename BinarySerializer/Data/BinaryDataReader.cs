@@ -27,61 +27,61 @@ namespace BinarySerializer.Data
 
         public byte ReadByte()
         {
-            if (!(InnerLen - _innerPosition >= 1))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.ByteSize))
                 throw new BufferException("Trying to read past the buffer size");
             byte retval = Buffer[_innerPosition];
-            _innerPosition++;
-            Position++;
+            _innerPosition += PrimitiveSize.ByteSize;
+            Position += PrimitiveSize.ByteSize;
             return retval;
         }
         
         public char ReadChar()
         {
-            if (!(InnerLen - _innerPosition >= 2))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.CharSize))
                 throw new BufferException("Trying to read past the buffer size");
             char retval = Buffer.ToChar(_innerPosition);
-            _innerPosition += 2;
-            Position += 2;
+            _innerPosition += PrimitiveSize.CharSize;
+            Position += PrimitiveSize.CharSize;
             return retval;    
         }
 
         public short ReadShort()
         {
-            if (!(InnerLen - _innerPosition >= 2))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.ShortSize))
                 throw new BufferException("Trying to read past the buffer size");
             short retval = Buffer.ToInt16(_innerPosition);
-            _innerPosition += 2;
-            Position += 2;
+            _innerPosition += PrimitiveSize.ShortSize;
+            Position += PrimitiveSize.ShortSize;
             return retval;
         }
 
         public sbyte ReadSByte()
         {
-            if (!(InnerLen - _innerPosition >= 1))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.SByteSize))
                 throw new BufferException("Trying to read past the buffer size");
             sbyte retval = unchecked((sbyte)Buffer[_innerPosition]);
-            _innerPosition++;
-            Position++;
+            _innerPosition += PrimitiveSize.SByteSize;
+            Position += PrimitiveSize.SByteSize;
             return retval;
         }
 
         public ushort ReadUShort()
         {
-            if (!(InnerLen - _innerPosition >= 2))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.UShortSize))
                 throw new BufferException("Trying to read past the buffer size");
             ushort retval = Buffer.ToUInt16(_innerPosition);
-            _innerPosition += 2;
-            Position += 2;
+            _innerPosition += PrimitiveSize.UShortSize;
+            Position += PrimitiveSize.UShortSize;
             return retval;
         }
 
         public double ReadDouble()
         {
-            if (!(InnerLen - _innerPosition >= 8))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.DoubleSize))
                 throw new BufferException("Trying to read past the buffer size");
             double retval = Buffer.ToDouble(_innerPosition);
-            _innerPosition += 8;
-            Position += 8;
+            _innerPosition += PrimitiveSize.DoubleSize;
+            Position += PrimitiveSize.DoubleSize;
             return retval;
         }
 
@@ -92,14 +92,19 @@ namespace BinarySerializer.Data
 
         public uint ReadUInt()
         {
-            if (!(InnerLen - _innerPosition >= 4))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.IntSize))
                 throw new BufferException("Trying to read past the buffer size");
             uint retval = Buffer.ToUInt32(_innerPosition);
-            _innerPosition += 4;
-            Position += 4;
+            _innerPosition += PrimitiveSize.IntSize;
+            Position += PrimitiveSize.IntSize;
             return retval;
         }
-        
+
+        public void Skip(int length)
+        {
+            _innerPosition += length;
+            Position += length;
+        }
         
         public long ReadLong()
         {
@@ -108,37 +113,37 @@ namespace BinarySerializer.Data
 
         public ulong ReadULong()
         {
-            if (!(InnerLen - _innerPosition >= 8))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.ULongSize))
                 throw new BufferException("Trying to read past the buffer size");
             ulong retval = Buffer.ToUInt64(_innerPosition);
-            _innerPosition += 8;
-            Position += 8;
+            _innerPosition += PrimitiveSize.ULongSize;
+            Position += PrimitiveSize.ULongSize;
             return retval;
         }
 
         public float ReadShortFloat()
         {
-            if (!(InnerLen - _innerPosition >= 2))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.ShortSize))
                 throw new BufferException("Trying to read past the buffer size");
             short retval = Buffer.ToInt16(_innerPosition);
-            _innerPosition += 2;
-            Position += 2;
+            _innerPosition += PrimitiveSize.ShortSize;
+            Position += PrimitiveSize.ShortSize;
             return retval / 256f;
         }
 
         public float ReadFloat()
         {
-            if (!(InnerLen - _innerPosition >= 4))
+            if (!(InnerLen - _innerPosition >= PrimitiveSize.FloatSize))
                 throw new BufferException("Trying to read past the buffer size");
             float retval = Buffer.ToSingle(_innerPosition);
-            _innerPosition += 4;
-            Position += 4;
+            _innerPosition += PrimitiveSize.FloatSize;
+            Position += PrimitiveSize.FloatSize;
             return retval;
         }
 
         public string ReadString()
         {
-            byte byteLen = ReadByte();
+            ushort byteLen = ReadUShort();
             if (byteLen <= 0)
                 return null;
 
@@ -150,7 +155,6 @@ namespace BinarySerializer.Data
             Position += byteLen;
             return retval;
         }
-
 
         public void CopyTo(byte[] dst, int srcOffset, int dstOffset, int count)
         {

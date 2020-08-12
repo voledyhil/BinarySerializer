@@ -18,15 +18,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 1 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 19 byte
+                                 23 byte
             */
             source.ByteObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ByteObjects.Add(1, new ChildMock {Bool = true});
@@ -38,15 +40,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 2 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 22 byte
+                                 26 byte
             */
             source.ShortObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ShortObjects.Add(1, new ChildMock {Bool = true});
@@ -58,15 +62,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 2 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 22 byte
+                                 26 byte
             */
             source.UShortObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.UShortObjects.Add(1, new ChildMock {Bool = true});
@@ -78,15 +84,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 4 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 28 byte
+                                 32 byte
             */
             source.IntObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.IntObjects.Add(1, new ChildMock {Bool = true});
@@ -98,15 +106,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 4 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 28 byte
+                                 32 byte
             */
             source.UIntObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.UIntObjects.Add(1, new ChildMock {Bool = true});
@@ -118,15 +128,17 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 8 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 0 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 40 byte
+                                 44 byte
             */
             source.LongObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.LongObjects.Add(1, new ChildMock {Bool = true});
@@ -138,22 +150,24 @@ namespace BinarySerializer.Tests
                 collection indices           3 * 8 byte
                     item 0 size              2 byte
                     item 0 int field index   1 byte
+                    item 0 ushort field len  2 byte
                     item 0 int field data    4 byte
                     
                     item 1 size              2 byte
                     item 1 bool field index  1 byte
+                    item 1 ushort field len  2 byte
                     item 1 bool field data   1 byte
                     
                     item 3 size              2 byte
                 ------------------------------------
-                                 40 byte
+                                 44 byte
             */
             source.ULongObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ULongObjects.Add(1, new ChildMock {Bool = true});
             source.ULongObjects.Add(3, new ChildMock());
 
             byte[] data = BinarySerializer.Serialize(source);
-            Assert.AreEqual(19 + 22 + 22 + 28 + 28 + 40 + 40, data.Length);
+            Assert.AreEqual(23 + 26 + 26 + 32 + 32 + 44 + 44, data.Length);
 
             CollectionsMock target = new CollectionsMock();
             BinarySerializer.Deserialize(target, data);
@@ -198,146 +212,38 @@ namespace BinarySerializer.Tests
         public void SerializeObjectCollectionBaselineTest()
         {
             CollectionsMock source = new CollectionsMock();
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 1 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 19 byte
-            */
+
             source.ByteObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ByteObjects.Add(1, new ChildMock {Bool = true});
             source.ByteObjects.Add(3, new ChildMock());
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 2 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 22 byte
-            */
+
             source.ShortObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ShortObjects.Add(1, new ChildMock {Bool = true});
             source.ShortObjects.Add(3, new ChildMock());
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 2 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 22 byte
-            */
+
             source.UShortObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.UShortObjects.Add(1, new ChildMock {Bool = true});
             source.UShortObjects.Add(3, new ChildMock());
 
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 4 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 28 byte
-            */
             source.IntObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.IntObjects.Add(1, new ChildMock {Bool = true});
             source.IntObjects.Add(3, new ChildMock());
 
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 4 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 28 byte
-            */
             source.UIntObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.UIntObjects.Add(1, new ChildMock {Bool = true});
             source.UIntObjects.Add(3, new ChildMock());
 
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 8 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 40 byte
-            */
             source.LongObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.LongObjects.Add(1, new ChildMock {Bool = true});
             source.LongObjects.Add(3, new ChildMock());
-            /*
-                collection index             1 byte
-                collection size              2 byte
-                collection indices           3 * 8 byte
-                    item 0 size              2 byte
-                    item 0 int field index   1 byte
-                    item 0 int field data    4 byte
-                    
-                    item 1 size              2 byte
-                    item 1 bool field index  1 byte
-                    item 1 bool field data   1 byte
-                    
-                    item 3 size              2 byte
-                ------------------------------------
-                                 40 byte
-            */
+
             source.ULongObjects.Add(0, new ChildMock {Int = int.MaxValue});
             source.ULongObjects.Add(1, new ChildMock {Bool = true});
             source.ULongObjects.Add(3, new ChildMock());
 
             Baseline<byte> baseline = new Baseline<byte>();
             byte[] data = BinarySerializer.Serialize(source, baseline);
-            Assert.AreEqual(19 + 22 + 22 + 28 + 28 + 40 + 40, data.Length);
+            Assert.AreEqual(23 + 26 + 26 + 32 + 32 + 44 + 44, data.Length);
 
             CollectionsMock target = new CollectionsMock();
             BinarySerializer.Deserialize(target, data);

@@ -5,33 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BinarySerializer.Tests
 {
     [TestClass]
-    public class MigrationTest
-    {
-        private class NodeA
-        {
-            [BinaryItem(0)] public int IntValue;
-            [BinaryItem(1)] public int UIntValue;
-        }
-
-        private class NodeB
-        {
-            [BinaryItem(1)] public int UIntValue;
-        }
-        
-        [TestMethod]
-        public void SerializeTest()
-        {
-            NodeA source = new NodeA {IntValue = 1, UIntValue = 2};
-            byte[] data = BinarySerializer.Serialize(source);
-            
-            NodeB target = new NodeB();
-            BinarySerializer.Deserialize(target, data);
-           
-            Assert.AreEqual(target.UIntValue, source.UIntValue);
-        }
-    }
-    
-    [TestClass]
     public class ComplexTest
     {
         private class NodeA

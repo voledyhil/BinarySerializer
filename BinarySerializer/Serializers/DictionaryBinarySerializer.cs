@@ -147,7 +147,7 @@ namespace BinarySerializer.Serializers
 
             while (reader.Position < reader.Length)
             {
-                TKey key = _writer.Read(reader);
+                TKey key = _writer.ReadData(reader);
                 if (_reservedKey.Equals(key))
                     break;
 
@@ -164,7 +164,7 @@ namespace BinarySerializer.Serializers
 
             while (reader.Position < reader.Length)
             {
-                collection.Remove(_writer.Read(reader));
+                collection.Remove(_writer.ReadData(reader));
             }
         }
 
@@ -179,7 +179,7 @@ namespace BinarySerializer.Serializers
                 
                 BinaryDataWriter itemWriter = writer.TryWriteNode(_keySize);
                 _itemSerializer.Serialize(collection[key], itemWriter);
-                _writer.Write(writer, key);
+                _writer.WriteData(writer, key);
                 itemWriter.PushNode();
             }
         }
@@ -202,7 +202,7 @@ namespace BinarySerializer.Serializers
                 _itemSerializer.Serialize(collections[key], itemWriter, itemBaseline);
                 if (itemWriter.Length > 0 || isNew)
                 {
-                    _writer.Write(writer, key);
+                    _writer.WriteData(writer, key);
                     itemWriter.PushNode();
                 }
                 
@@ -212,11 +212,11 @@ namespace BinarySerializer.Serializers
             if (baseKeys.Count <= 0)
                 return;
 
-            _writer.Write(writer, _reservedKey);
+            _writer.WriteData(writer, _reservedKey);
            
             foreach (TKey key in baseKeys)
             {
-                _writer.Write(writer, key);
+                _writer.WriteData(writer, key);
                 baseline.DestroyBaseline(key);
             }
         }
@@ -225,7 +225,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryByteKeyBinarySerializer : DictionaryBinarySerializer<byte, ByteWriter>
     {
         public DictionaryByteKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, ByteWriter writer) : base(
-            sizeof(byte), byte.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.ByteSize, byte.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -233,7 +233,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryShortKeyBinarySerializer : DictionaryBinarySerializer<short, ShortWriter>
     {
         public DictionaryShortKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, ShortWriter writer) : base(
-            sizeof(ushort), short.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.ShortSize, short.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -241,7 +241,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryUShortKeyBinarySerializer : DictionaryBinarySerializer<ushort, UShortWriter>
     {
         public DictionaryUShortKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, UShortWriter writer) : base(
-            sizeof(ushort), ushort.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.UShortSize, ushort.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -249,7 +249,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryIntKeyBinarySerializer : DictionaryBinarySerializer<int, IntWriter>
     {
         public DictionaryIntKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, IntWriter writer) : base(
-            sizeof(int), int.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.IntSize, int.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -257,7 +257,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryUIntKeyBinarySerializer : DictionaryBinarySerializer<uint, UIntWriter>
     {
         public DictionaryUIntKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, UIntWriter writer) : base(
-            sizeof(int), uint.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.UIntSize, uint.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -265,7 +265,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryLongKeyBinarySerializer : DictionaryBinarySerializer<long, LongWriter>
     {
         public DictionaryLongKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, LongWriter writer) : base(
-            sizeof(long), long.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.LongSize, long.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }
@@ -273,7 +273,7 @@ namespace BinarySerializer.Serializers
     public class DictionaryULongKeyBinarySerializer : DictionaryBinarySerializer<ulong, ULongWriter>
     {
         public DictionaryULongKeyBinarySerializer(ObjectActivator itemCreator, CompositeBinarySerializer itemSerializer, ULongWriter writer) : base(
-            sizeof(long), long.MaxValue, itemCreator, itemSerializer, writer)
+            PrimitiveSize.ULongSize, long.MaxValue, itemCreator, itemSerializer, writer)
         {
         }
     }

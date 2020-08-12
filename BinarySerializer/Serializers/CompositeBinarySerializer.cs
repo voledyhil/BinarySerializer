@@ -21,7 +21,13 @@ namespace BinarySerializer.Serializers
             {
                 byte id = reader.ReadByte();
                 if (_items.TryGetValue(id, out IBinarySerializer serializer))
+                {
                     serializer.Update(obj, reader);
+                }
+                else
+                {
+                    reader.Skip(reader.ReadUShort());
+                }
             }
         }
 

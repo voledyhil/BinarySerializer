@@ -7,8 +7,10 @@ namespace BinarySerializer.Serializers
     {
         int GetHashCode(T value);
         bool Equals(T a, T b);
-        void Write(BinaryDataWriter writer, T value);
-        T Read(BinaryDataReader reader);
+        void WriteSize(BinaryDataWriter writer);
+        void WriteData(BinaryDataWriter writer, T value);
+        void SkipSize(BinaryDataReader reader);
+        T ReadData(BinaryDataReader reader);
     }
     
     public sealed class BoolWriter : IPrimitiveWriter<bool>
@@ -23,12 +25,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, bool value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.BoolSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, bool value)
         {
             writer.WriteBool(value);
         }
 
-        public bool Read(BinaryDataReader reader)
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
+
+        public bool ReadData(BinaryDataReader reader)
         {
             return reader.ReadBool();
         }
@@ -46,12 +58,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, byte value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.ByteSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, byte value)
         {
             writer.WriteByte(value);
         }
 
-        public byte Read(BinaryDataReader reader)
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
+        
+        public byte ReadData(BinaryDataReader reader)
         {
             return reader.ReadByte();
         }
@@ -69,12 +91,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, char value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.CharSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, char value)
         {
             writer.WriteChar(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public char Read(BinaryDataReader reader)
+        public char ReadData(BinaryDataReader reader)
         {
             return reader.ReadChar();
         }
@@ -92,12 +124,22 @@ namespace BinarySerializer.Serializers
             return Math.Abs(a - b) < 1e-6;
         }
 
-        public void Write(BinaryDataWriter writer, double value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.DoubleSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, double value)
         {
             writer.WriteDouble(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public double Read(BinaryDataReader reader)
+        public double ReadData(BinaryDataReader reader)
         {
             return reader.ReadDouble();
         }
@@ -115,12 +157,22 @@ namespace BinarySerializer.Serializers
             return Math.Abs(a - b) < 1e-6;
         }
 
-        public void Write(BinaryDataWriter writer, float value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.FloatSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, float value)
         {
             writer.WriteFloat(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public float Read(BinaryDataReader reader)
+        public float ReadData(BinaryDataReader reader)
         {
             return reader.ReadFloat();
         }
@@ -138,12 +190,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, int value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.IntSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, int value)
         {
             writer.WriteInt(value);
         }
-
-        public int Read(BinaryDataReader reader)
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
+        
+        public int ReadData(BinaryDataReader reader)
         {
             return reader.ReadInt();
         }
@@ -161,12 +223,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, long value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.LongSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, long value)
         {
             writer.WriteLong(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public long Read(BinaryDataReader reader)
+        public long ReadData(BinaryDataReader reader)
         {
             return reader.ReadLong();
         }
@@ -184,12 +256,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, sbyte value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.SByteSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, sbyte value)
         {
             writer.WriteSByte(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public sbyte Read(BinaryDataReader reader)
+        public sbyte ReadData(BinaryDataReader reader)
         {
             return reader.ReadSByte();
         }
@@ -207,12 +289,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, short value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.ShortSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, short value)
         {
             writer.WriteShort(value);
         }
-
-        public short Read(BinaryDataReader reader)
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
+        
+        public short ReadData(BinaryDataReader reader)
         {
             return reader.ReadShort();
         }
@@ -230,16 +322,25 @@ namespace BinarySerializer.Serializers
             return Math.Abs(a - b) < 1e-6;
         }
 
-        public void Write(BinaryDataWriter writer, float value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.ShortSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, float value)
         {
             writer.WriteShortFloat(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public float Read(BinaryDataReader reader)
+        public float ReadData(BinaryDataReader reader)
         {
             return reader.ReadShortFloat();
         }
-
     }
 
     public sealed class StringWriter : IPrimitiveWriter<string>
@@ -271,12 +372,20 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, string value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+        }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+        }
+
+        public void WriteData(BinaryDataWriter writer, string value)
         {
             writer.WriteString(value);
         }
 
-        public string Read(BinaryDataReader reader)
+        public string ReadData(BinaryDataReader reader)
         {
             return reader.ReadString();
         }
@@ -294,12 +403,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, uint value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.UIntSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, uint value)
         {
             writer.WriteUInt(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public uint Read(BinaryDataReader reader)
+        public uint ReadData(BinaryDataReader reader)
         {
             return reader.ReadUInt();
         }
@@ -317,12 +436,22 @@ namespace BinarySerializer.Serializers
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, ulong value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.ULongSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, ulong value)
         {
             writer.WriteULong(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public ulong Read(BinaryDataReader reader)
+        public ulong ReadData(BinaryDataReader reader)
         {
             return reader.ReadULong();
         }
@@ -334,18 +463,28 @@ namespace BinarySerializer.Serializers
         {
             return value.GetHashCode();
         }
-
+        
         public bool Equals(ushort a, ushort b)
         {
             return a == b;
         }
 
-        public void Write(BinaryDataWriter writer, ushort value)
+        public void WriteSize(BinaryDataWriter writer)
+        {
+            writer.WriteUShort(PrimitiveSize.UShortSize);
+        }
+
+        public void WriteData(BinaryDataWriter writer, ushort value)
         {
             writer.WriteUShort(value);
         }
+        
+        public void SkipSize(BinaryDataReader reader)
+        {
+            reader.ReadUShort();
+        }
 
-        public ushort Read(BinaryDataReader reader)
+        public ushort ReadData(BinaryDataReader reader)
         {
             return reader.ReadUShort();
         }
